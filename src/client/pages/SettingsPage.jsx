@@ -99,11 +99,7 @@ export default function SettingsPage({ backend }) {
         ),
         alerts: (
             <>
-                <AlertQueuePanel
-                    queue={backend.alertQueue}
-                    settings={draft.alerts}
-                    onToggle={(setting, enabled) => setValue(['alerts', setting], enabled)}
-                />
+                <AlertQueuePanel queue={backend.alertQueue} settings={draft.alerts} />
                 <AlertSettings
                     {...sectionProps('alerts')}
                     // « Par défaut » ne touche pas aux sons, qui ont leurs propres boutons.

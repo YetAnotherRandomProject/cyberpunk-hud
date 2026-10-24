@@ -16,59 +16,28 @@ function ago(timestamp, now) {
 }
 
 /**
- * Feed des alertes : celle affichée sur l'overlay, celles en attente (à retirer une par une
- * ou par type). Les boutons de type reprennent les interrupteurs de la section Alertes :
- * un type désactivé est en pause, ses alertes restent en attente sans s'afficher.
+ * Feed des alertes : celle affichée sur l'overlay, et celles en attente (à retirer une par une,
+ * celles en pause, ou toutes). Un type désactivé dans la section Alertes est en pause :
+ * ses alertes restent en attente sans s'afficher.
  */
-export default function AlertQueuePanel({ queue, settings, onToggle }) {
+export default function AlertQueuePanel({ queue, settings }) {
     const now = useClock().getTime();
     const [error, setError] = useState(null);
     const { current, pending } = queue;
     const pausedSet = new Set(ALERT_KINDS.filter(({ setting }) => !settings[setting]).map(({ kind }) => kind));
+    const heldKinds = [...pausedSet].filter(kind => pending.some(alert => alert.kind === kind));
+    const heldCount = pending.filter(alert => pausedSet.has(alert.kind)).length;
 
     const run = action => () => {
         setError(null);
         action().catch(err => setError(err.message));
     };
-    const countOf = kind => pending.filter(alert => alert.kind === kind).length;
 
     return (
         <Section
             title="File d'attente"
             description="Les alertes, tests compris, s'affichent une par une sur tous les overlays (OBS et aperçu). Désactiver un type le met en pause (par exemple les follows pendant une vague de bots) : ses alertes restent ici sans s'afficher, et vous pouvez les retirer."
         >
-            <div className="alert-queue__kinds">
-                {ALERT_KINDS.map(({ kind, label, setting }) => {
-                    const isPaused = pausedSet.has(kind);
-                    const count = countOf(kind);
-                    return (
-                        <div key={kind} className={`alert-queue__kind${isPaused ? ' is-paused' : ''}`}>
-                            <button
-                                type="button"
-                                className="alert-queue__pause"
-                                aria-pressed={isPaused}
-                                title={isPaused ? 'Réactiver ce type d\'alerte' : 'Désactiver (mettre en pause) ce type d\'alerte'}
-                                onClick={() => onToggle(setting, isPaused)}
-                            >
-                                <span className="alert-queue__pause-icon">{isPaused ? '▶' : '❚❚'}</span>
-                                <span>{label}</span>
-                                {count > 0 && <span className="alert-queue__count">{count}</span>}
-                            </button>
-                            {count > 0 && (
-                                <button
-                                    type="button"
-                                    className="alert-queue__clear"
-                                    title={`Retirer les ${count} alertes « ${label} » en attente`}
-                                    onClick={run(() => clearQueuedAlerts(kind))}
-                                >
-                                    Vider
-                                </button>
-                            )}
-                        </div>
-                    );
-                })}
-            </div>
-
             <div className="alert-queue__current">
                 <span className="alert-queue__heading">À l'écran</span>
                 {current ? (
@@ -88,11 +57,23 @@ export default function AlertQueuePanel({ queue, settings, onToggle }) {
             <div className="alert-queue__pending">
                 <div className="alert-queue__heading">
                     <span>En attente ({pending.length})</span>
-                    {pending.length > 0 && (
-                        <button type="button" className="ui-button is-secondary is-small" onClick={run(() => clearQueuedAlerts())}>
-                            Tout vider
-                        </button>
-                    )}
+                    <span className="alert-queue__heading-actions">
+                        {/* Vague de bots : on purge les types en pause sans toucher aux autres alertes. */}
+                        {heldKinds.length > 0 && heldCount < pending.length && (
+                            <button
+                                type="button"
+                                className="ui-button is-secondary is-small"
+                                onClick={run(() => Promise.all(heldKinds.map(kind => clearQueuedAlerts(kind))))}
+                            >
+                                Retirer celles en pause ({heldCount})
+                            </button>
+                        )}
+                        {pending.length > 0 && (
+                            <button type="button" className="ui-button is-secondary is-small" onClick={run(() => clearQueuedAlerts())}>
+                                Tout vider
+                            </button>
+                        )}
+                    </span>
                 </div>
                 {pending.length === 0 && <span className="alert-queue__empty">File vide</span>}
                 <ul className="alert-queue__list">
