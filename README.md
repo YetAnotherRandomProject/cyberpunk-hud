@@ -54,7 +54,7 @@ La connexion (jetons) est stockée à part dans `twitch-auth.json`, jamais envoy
 Dans l'onglet Alertes :
 
 - **File d'attente** : les alertes s'affichent une par une. On voit celle à l'écran (bouton « Passer ») et celles en attente, qu'on peut retirer une à une ou par type.
-- **Trois états par type** (Actif / Pause / Désactivé) : un type en pause garde ses alertes dans la file sans les afficher, un type désactivé les ignore. Pendant une vague de bots, mettre les follows en pause les garde en attente ; « Retirer celles en pause » les supprime ensuite sans toucher aux autres alertes. Les autres types continuent de s'afficher. Les alertes de test suivent les mêmes règles et s'affichent sur l'overlay OBS.
+- **Trois états par type** (Actif / Pause / Désactivé) : un type en pause garde ses alertes dans la file sans les afficher, un type désactivé les ignore, et ses alertes déjà en attente sont retirées. Pendant une vague de bots, mettre les follows en pause les garde en attente ; « Retirer celles en pause » les supprime ensuite sans toucher aux autres alertes. Les autres types continuent de s'afficher. Les alertes de test suivent les mêmes règles et s'affichent sur l'overlay OBS.
 - **Sons** : un son par type (follow, raid, sub, resub, subs offerts, bits), envoyé depuis le PC (MP3, WAV, OGG, M4A… 10 Mo max), avec son volume. Il est joué par l'overlay dans OBS, et l'alerte suivante attend la fin de l'affichage et du son ; cocher « Contrôler l'audio via OBS » dans la source navigateur pour le passer dans le mixeur. Les sons sont inclus dans l'export .zip.
 
 ### CPU / RAM / FPS

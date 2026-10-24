@@ -10,7 +10,7 @@ import { FrameRateSource } from './telemetry/system/FrameRateSource.js';
 import { TwitchAuth } from './telemetry/twitch/TwitchAuth.js';
 import { TwitchSource } from './telemetry/twitch/TwitchSource.js';
 import { RecentEvents } from './telemetry/twitch/RecentEvents.js';
-import { AlertQueue } from './alerts/AlertQueue.js';
+import { ALERT_KINDS, AlertQueue } from './alerts/AlertQueue.js';
 import { SoundStore } from './alerts/SoundStore.js';
 import { soundFor } from './alerts/alertSound.js';
 import { ChatSource } from './chat/ChatSource.js';
@@ -147,8 +147,14 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
         });
         chatSource.on('delete', target => broadcaster.broadcast('CHAT_DELETE', target));
         chatSource.on('clear', () => broadcaster.broadcast('CHAT_CLEAR', null));
-        configStore.on('change', config => {
+        configStore.on('change', (config, prev) => {
             applyConfig(config);
+            // Type qui vient d'être désactivé : ses alertes en attente sont purgées
+            // (celle éventuellement à l'écran termine son affichage).
+            for (const kind of ALERT_KINDS) {
+                const nowOff = alertMode(kind, config.alerts) === 'off';
+                if (nowOff && alertMode(kind, prev.alerts) !== 'off') alertQueue.clear(kind);
+            }
             alertQueue.refresh();
             broadcaster.broadcast('CONFIG_UPDATE', config);
         });

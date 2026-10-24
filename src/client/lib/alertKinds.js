@@ -12,7 +12,7 @@ export const ALERT_KINDS = [
 export const ALERT_MODES = [
     { value: 'active', label: 'Actif', hint: 'Affichée sur l\'overlay.' },
     { value: 'paused', label: 'Pause', hint: 'Gardée dans la file sans s\'afficher.' },
-    { value: 'off', label: 'Désactivé', hint: 'Ignorée.' }
+    { value: 'off', label: 'Désactivé', hint: 'Ignorée ; les alertes de ce type en attente sont retirées.' }
 ];
 
 export const ALERT_KIND_LABEL = {
