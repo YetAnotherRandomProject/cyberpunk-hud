@@ -1,5 +1,6 @@
 import express from 'express';
 import { defaultConfig } from '../config/defaults.js';
+import { exportConfig } from '../config/exportConfig.js';
 import { listOpenWindows } from '../telemetry/system/windows.js';
 
 const TEST_ALERTS = {
@@ -17,6 +18,13 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, emit
     router.get('/config', (req, res) => res.json(configStore.get()));
 
     router.get('/config/defaults', (req, res) => res.json(defaultConfig));
+
+    // Téléchargement de la configuration de l'overlay, sans Client ID, secret ni mot de passe OBS.
+    router.get('/config/export', (req, res) => {
+        const date = new Date().toISOString().slice(0, 10);
+        res.attachment(`cyberpunk-hud-overlay-${date}.json`);
+        res.type('application/json').send(JSON.stringify(exportConfig(configStore.get()), null, 2));
+    });
 
     router.put('/config', (req, res) => {
         res.json(configStore.update(req.body ?? {}));

@@ -14,6 +14,7 @@ import ChatSettings from '../components/settings/ChatSettings.jsx';
 import AlertSettings from '../components/settings/AlertSettings.jsx';
 import ThemeSettings from '../components/settings/ThemeSettings.jsx';
 import ServerSettings from '../components/settings/ServerSettings.jsx';
+import ExportSettings from '../components/settings/ExportSettings.jsx';
 import './SettingsPage.css';
 
 // Onglets du panneau, et services dont un problème est signalé par une pastille sur l'onglet.
@@ -102,6 +103,7 @@ export default function SettingsPage({ backend }) {
             <>
                 <SystemSettings {...sectionProps('system')} fps={backend.telemetry.fps} />
                 <ServerSettings {...sectionProps('server')} runtime={backend.runtime} />
+                <ExportSettings />
             </>
         ),
         look: <ThemeSettings {...sectionProps('theme')} />
