@@ -11,7 +11,9 @@ Overlay OBS style Cyberpunk 2077 (Arasaka / Kiroshi) alimenté par les vraies st
 
 L'overlay tel qu'OBS l'affiche en 1920×1080 (ici sur un fond neutre, avec des données de démonstration) :
 
-![Overlay complet : marque, statut système, dernier follower, carte streameur, tchat et bandeau de télémétrie](docs/screenshots/overlay.png)
+![Overlay complet : marque, statut système, derniers sub / subs offerts / bits / raid, carte streameur, tchat et bandeau de télémétrie](docs/screenshots/overlay.png)
+
+En haut à droite, les derniers événements de la chaîne : dernier sub (mois cumulés), derniers subs offerts (qui et combien), derniers bits et dernier raid. Ils sont mémorisés entre deux lancements. Le dernier follower existe aussi, désactivé par défaut (section Disposition).
 
 | Alerte de resub | Alerte de raid |
 | --- | --- |

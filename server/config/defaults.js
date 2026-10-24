@@ -72,7 +72,11 @@ export const defaultConfig = {
         topCenterTelemetry: { enabled: true, x: 690, y: 38, scale: 1, tilt: 0 },
         bottomLeftModule: { enabled: true, x: 44, y: 825, scale: 1, tilt: 12 },
         bottomRightTicker: { enabled: true, x: 1410, y: 940, scale: 1, tilt: -12 },
-        lastFollower: { enabled: true, x: 1560, y: 30, scale: 1, tilt: -8 },
+        lastSub: { enabled: true, x: 1560, y: 30, scale: 1, tilt: -8 },
+        lastGiftSub: { enabled: true, x: 1560, y: 108, scale: 1, tilt: -8 },
+        lastCheer: { enabled: true, x: 1560, y: 186, scale: 1, tilt: -8 },
+        lastRaid: { enabled: true, x: 1560, y: 264, scale: 1, tilt: -8 },
+        lastFollower: { enabled: false, x: 1560, y: 342, scale: 1, tilt: -8 },
         chatBox: { enabled: true, x: 1470, y: 780, scale: 1, tilt: -6 },
         alertBanner: { enabled: true, x: 660, y: 400, scale: 1, tilt: 0 }
     }

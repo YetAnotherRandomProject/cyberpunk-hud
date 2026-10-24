@@ -23,6 +23,8 @@ export class TelemetryState extends EventEmitter {
         eventSub: null
     };
     chat = { connected: false, error: null };
+    // Derniers événements de la chaîne reçus en direct (voir RecentEvents).
+    recent = { sub: null, giftsub: null, cheer: null, raid: null };
     // Mesure des FPS du jeu. status : 'off' | 'waiting' | 'running' | 'error'
     fps = { status: 'off', error: null, process: null, detail: null };
     metrics = {};
@@ -89,6 +91,10 @@ export class TelemetryState extends EventEmitter {
                 broadcasterType: this.twitch.broadcasterType,
                 isLive: this.twitch.isLive,
                 lastFollower: this.twitch.lastFollower,
+                lastSub: this.recent.sub,
+                lastGiftSub: this.recent.giftsub,
+                lastCheer: this.recent.cheer,
+                lastRaid: this.recent.raid,
                 scene: this.obs.scene,
                 uptimeSeconds: this.obs.uptimeSeconds ?? twitchUptime
             },

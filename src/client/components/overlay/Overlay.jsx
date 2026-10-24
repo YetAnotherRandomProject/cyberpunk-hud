@@ -4,7 +4,8 @@ import TopLeftBrand from './TopLeftBrand.jsx';
 import TopCenterTelemetry from './TopCenterTelemetry.jsx';
 import StreamerCard from './StreamerCard.jsx';
 import StockTicker from './StockTicker.jsx';
-import LastFollower from './LastFollower.jsx';
+import LastEvent from './LastEvent.jsx';
+import { LAST_EVENTS } from './lastEvents.js';
 import AlertBanner from './AlertBanner.jsx';
 import ChatBox from './ChatBox.jsx';
 import './Overlay.css';
@@ -36,9 +37,11 @@ export default function Overlay({ config, telemetry, alerts = [], chat = [], edi
                 <StockTicker hud={hud} telemetry={telemetry} />
             </Widget>
 
-            <Widget {...widgetProps('lastFollower')}>
-                <LastFollower follower={telemetry.streamer.lastFollower} showPlaceholder={editable} />
-            </Widget>
+            {LAST_EVENTS.map(({ id, label, read }) => (
+                <Widget key={id} {...widgetProps(id)}>
+                    <LastEvent label={label} event={read(telemetry.streamer)} showPlaceholder={editable} />
+                </Widget>
+            ))}
 
             {config.chat.enabled && (
                 <Widget {...widgetProps('chatBox')}>

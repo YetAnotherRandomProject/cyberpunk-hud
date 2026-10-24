@@ -1,17 +1,17 @@
-.last-follower {
+.last-event {
     min-width: 240px;
     padding: 6px 14px 7px 10px;
     border-left: 3px solid var(--hud-highlight);
     border-bottom: 1px solid var(--hud-primary);
-    background: linear-gradient(90deg, var(--hud-primary-bg), transparent);
+    background: linear-gradient(90deg, rgba(var(--hud-primary-rgb), 0.14), transparent);
     opacity: 0.92;
 }
 
-.last-follower.is-placeholder {
+.last-event.is-placeholder {
     opacity: 0.5;
 }
 
-.last-follower__label {
+.last-event__label {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -21,17 +21,27 @@
     opacity: 0.85;
 }
 
-.last-follower__name {
+.last-event__body {
+    animation: last-event-in 0.4s ease-out;
+}
+
+.last-event__name {
     margin-top: 2px;
     font-family: var(--font-display);
     font-weight: 800;
     font-size: 20px;
     letter-spacing: 2px;
     color: var(--hud-highlight);
-    animation: last-follower-in 0.4s ease-out;
 }
 
-@keyframes last-follower-in {
+.last-event__detail {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    opacity: 0.85;
+}
+
+@keyframes last-event-in {
     from { opacity: 0; transform: translateX(-10px); }
     to { opacity: 1; transform: none; }
 }

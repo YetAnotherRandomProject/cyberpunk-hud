@@ -8,6 +8,7 @@ import { SystemSource } from './telemetry/system/SystemSource.js';
 import { FrameRateSource } from './telemetry/system/FrameRateSource.js';
 import { TwitchAuth } from './telemetry/twitch/TwitchAuth.js';
 import { TwitchSource } from './telemetry/twitch/TwitchSource.js';
+import { RecentEvents } from './telemetry/twitch/RecentEvents.js';
 import { ChatSource } from './chat/ChatSource.js';
 import { JsonCache } from './cache/JsonCache.js';
 import { MediaCache } from './cache/MediaCache.js';
@@ -34,7 +35,12 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     const obsSource = new ObsSource(telemetry);
     const systemSource = new SystemSource(telemetry);
     const frameRateSource = new FrameRateSource(telemetry);
-    const twitchSource = new TwitchSource(telemetry, twitchAuth, alert => emitAlert(alert));
+    const recentEvents = new RecentEvents(path.join(dataDir, 'recent-events.json'), telemetry);
+    // Les vrais événements mettent à jour les widgets « dernier… », même si leur alerte est désactivée.
+    const twitchSource = new TwitchSource(telemetry, twitchAuth, alert => {
+        recentEvents.record(alert);
+        emitAlert(alert);
+    });
     // Surtout pas « cache » : sous Windows (insensible à la casse) ce serait le dossier
     // « Cache » de Chromium dans le profil Electron, qu'il vide à sa guise.
     const cacheDir = path.join(dataDir, 'hud-cache');
@@ -89,6 +95,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
         frameRateSource.configure(config.system);
         twitchAuth.setClient(config.twitch.clientId.trim(), config.twitch.clientSecret.trim());
         twitchSource.configure(config.twitch);
+        recentEvents.setChannel(config.twitch.channel);
         chatSource.configure(config.chat, config.twitch.channel);
     }
 

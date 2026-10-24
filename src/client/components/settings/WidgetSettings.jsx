@@ -6,9 +6,13 @@ export const WIDGET_LABELS = {
     topCenterTelemetry: 'Barre de statut (haut centre)',
     bottomLeftModule: 'Carte streameur (bas gauche)',
     bottomRightTicker: 'Ticker boursier (bas droite)',
+    lastSub: 'Dernier sub (mois cumulés)',
+    lastGiftSub: 'Derniers subs offerts',
+    lastCheer: 'Derniers bits',
+    lastRaid: 'Dernier raid',
     lastFollower: 'Dernier follower',
     chatBox: 'Tchat',
-    alertBanner: 'Alertes follow / raid'
+    alertBanner: 'Alertes'
 };
 
 export default function WidgetSettings({ values, onChange, onReset }) {
