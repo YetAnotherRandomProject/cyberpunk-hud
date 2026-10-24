@@ -6,6 +6,9 @@ const SECRET_PATHS = [
     ['obs', 'password']
 ];
 
+// Réglages propres à ce PC, jamais remplacés par un import (le port du serveur HUD).
+const LOCAL_SECTIONS = ['server'];
+
 export const EXPORT_FORMAT = 'cyberpunk-hud-config';
 
 /**
@@ -21,4 +24,22 @@ export function exportConfig(config) {
         exportedAt: new Date().toISOString(),
         config: copy
     };
+}
+
+/**
+ * Réglages à appliquer depuis un fichier d'export. Les secrets et les réglages propres
+ * à ce PC en sont retirés (même si le fichier en contient) : fusionnés à la config
+ * actuelle, ils gardent leur valeur locale.
+ */
+export function importPatch(file) {
+    if (file?.format !== EXPORT_FORMAT || typeof file.config !== 'object' || file.config === null) {
+        throw new Error('Ce fichier n\'est pas un export de configuration Cyberpunk HUD.');
+    }
+    if (file.formatVersion > 1) {
+        throw new Error('Ce fichier vient d\'une version plus récente de Cyberpunk HUD : mettez l\'application à jour.');
+    }
+    const patch = structuredClone(file.config);
+    for (const [section, key] of SECRET_PATHS) delete patch[section]?.[key];
+    for (const section of LOCAL_SECTIONS) delete patch[section];
+    return patch;
 }

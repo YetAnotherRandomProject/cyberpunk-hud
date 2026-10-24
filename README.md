@@ -34,7 +34,7 @@ Dans l'aperçu en direct, on glisse un élément pour le placer ; un clic dessus
 3. Copier l'URL affichée en haut (`http://127.0.0.1:3000/overlay`) dans une **Source navigateur** OBS en 1920×1080.
 4. Laisser l'application ouverte pendant le stream.
 
-Tous les réglages se font dans la fenêtre et sont enregistrés automatiquement dans `%APPDATA%\Cyberpunk HUD\config.json`. L'onglet Système permet d'exporter la configuration de l'overlay dans un fichier JSON, sans le Client ID, le Client secret Twitch ni le mot de passe OBS.
+Tous les réglages se font dans la fenêtre et sont enregistrés automatiquement dans `%APPDATA%\Cyberpunk HUD\config.json`. L'onglet Système permet d'exporter la configuration de l'overlay dans un fichier JSON, sans le Client ID, le Client secret Twitch ni le mot de passe OBS, puis de la réimporter : ces secrets et le port du serveur gardent alors leur valeur locale.
 
 ### Mises à jour
 

@@ -1,0 +1,14 @@
+.backup-settings__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.backup-settings__message {
+    font-size: 13px;
+    color: var(--ui-ok);
+}
+
+.backup-settings__message.is-error {
+    color: var(--ui-error);
+}

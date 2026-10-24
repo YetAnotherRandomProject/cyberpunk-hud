@@ -40,5 +40,13 @@ export function useConfigDraft(serverConfig) {
         setDraft(prev => setIn(prev, path, value));
     }, []);
 
-    return { draft, setValue, saveState };
+    // Remplace toute la copie locale par une config déjà enregistrée côté serveur (import) :
+    // rien à renvoyer, et une sauvegarde en attente ne doit pas l'écraser.
+    const replaceDraft = useCallback(config => {
+        dirty.current = false;
+        setDraft(config);
+        setSaveState('saved');
+    }, []);
+
+    return { draft, setValue, replaceDraft, saveState };
 }

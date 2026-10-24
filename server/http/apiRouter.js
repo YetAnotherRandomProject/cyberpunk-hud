@@ -1,6 +1,6 @@
 import express from 'express';
 import { defaultConfig } from '../config/defaults.js';
-import { exportConfig } from '../config/exportConfig.js';
+import { exportConfig, importPatch } from '../config/exportConfig.js';
 import { listOpenWindows } from '../telemetry/system/windows.js';
 
 const TEST_ALERTS = {
@@ -24,6 +24,15 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, emit
         const date = new Date().toISOString().slice(0, 10);
         res.attachment(`cyberpunk-hud-overlay-${date}.json`);
         res.type('application/json').send(JSON.stringify(exportConfig(configStore.get()), null, 2));
+    });
+
+    // Applique un fichier d'export en conservant les secrets et le port locaux.
+    router.post('/config/import', (req, res) => {
+        try {
+            res.json(configStore.update(importPatch(req.body)));
+        } catch (err) {
+            res.status(400).json({ error: err.message });
+        }
     });
 
     router.put('/config', (req, res) => {

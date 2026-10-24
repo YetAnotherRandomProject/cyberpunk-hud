@@ -11,6 +11,7 @@ async function request(method, url, body) {
 
 export const saveConfig = config => request('PUT', '/api/config', config);
 export const fetchDefaults = () => request('GET', '/api/config/defaults');
+export const importConfig = file => request('POST', '/api/config/import', file);
 export const requestRestart = () => request('POST', '/api/restart');
 export const startTwitchAuth = () => request('POST', '/api/twitch/auth/start');
 export const cancelTwitchAuth = () => request('POST', '/api/twitch/auth/cancel');

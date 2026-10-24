@@ -103,11 +103,6 @@ body {
     color: var(--ui-accent);
 }
 
-/* Lien stylé en bouton : pas de largeur pleine dans une section. */
-.export-settings__button {
-    align-self: flex-start;
-}
-
 .ui-button.is-small {
     padding: 3px 8px;
     font-size: 9px;

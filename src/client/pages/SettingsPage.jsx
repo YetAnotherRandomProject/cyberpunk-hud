@@ -14,7 +14,7 @@ import ChatSettings from '../components/settings/ChatSettings.jsx';
 import AlertSettings from '../components/settings/AlertSettings.jsx';
 import ThemeSettings from '../components/settings/ThemeSettings.jsx';
 import ServerSettings from '../components/settings/ServerSettings.jsx';
-import ExportSettings from '../components/settings/ExportSettings.jsx';
+import BackupSettings from '../components/settings/BackupSettings.jsx';
 import './SettingsPage.css';
 
 // Onglets du panneau, et services dont un problème est signalé par une pastille sur l'onglet.
@@ -45,7 +45,7 @@ function worstTone(statuses) {
 
 // Panneau de contrôle : tous les réglages du HUD, enregistrés automatiquement.
 export default function SettingsPage({ backend }) {
-    const { draft, setValue, saveState } = useConfigDraft(backend.config);
+    const { draft, setValue, replaceDraft, saveState } = useConfigDraft(backend.config);
     const [defaults, setDefaults] = useState(null);
     const [activeTab, setActiveTab] = useState(readStoredTab);
     // Élément de l'overlay dont les réglages remplacent l'onglet courant (null = onglets).
@@ -103,7 +103,7 @@ export default function SettingsPage({ backend }) {
             <>
                 <SystemSettings {...sectionProps('system')} fps={backend.telemetry.fps} />
                 <ServerSettings {...sectionProps('server')} runtime={backend.runtime} />
-                <ExportSettings />
+                <BackupSettings onImported={replaceDraft} />
             </>
         ),
         look: <ThemeSettings {...sectionProps('theme')} />
