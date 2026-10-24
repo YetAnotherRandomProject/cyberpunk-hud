@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { sendTestAlert } from '../../lib/api.js';
 import Section from './Section.jsx';
-import ToggleField from './fields/ToggleField.jsx';
+import ModeField from './fields/ModeField.jsx';
+import { ALERT_KINDS, ALERT_MODES } from '../../lib/alertKinds.js';
 import NumberField from './fields/NumberField.jsx';
 import './AlertSettings.css';
 
@@ -14,7 +15,8 @@ const TESTS = [
     { kind: 'cheer', label: 'Bits' }
 ];
 
-export default function AlertSettings({ values, onChange, onReset, accountConnected }) {
+// onModeChange(kind, mode) écrit un seul mode : deux clics rapprochés ne s'écrasent pas.
+export default function AlertSettings({ values, onChange, onModeChange, onReset, accountConnected }) {
     const [error, setError] = useState(null);
 
     const test = kind => () => {
@@ -26,15 +28,19 @@ export default function AlertSettings({ values, onChange, onReset, accountConnec
         <Section
             title="Alertes"
             description={accountConnected
-                ? 'Follows, raids, subs et bits s\'affichent en direct sur l\'overlay. Désactiver un type le met en pause : ses alertes attendent dans la file sans s\'afficher. Subs et bits exigent le compte du streameur.'
+                ? 'Follows, raids, subs et bits s\'affichent en direct sur l\'overlay. Pour chaque type : Actif (affichée), Pause (gardée dans la file sans s\'afficher) ou Désactivé (ignorée). Subs et bits exigent le compte du streameur.'
                 : 'Connectez le compte Twitch (section Twitch) pour recevoir les vraies alertes. Les tests fonctionnent sans.'}
             onReset={onReset}
         >
-            <ToggleField label="Alerte de follow" value={values.followEnabled} onChange={v => onChange('followEnabled', v)} />
-            <ToggleField label="Alerte de raid" value={values.raidEnabled} onChange={v => onChange('raidEnabled', v)} />
-            <ToggleField label="Alerte de sub / resub" value={values.subEnabled} onChange={v => onChange('subEnabled', v)} />
-            <ToggleField label="Alerte de subs offerts" value={values.giftSubEnabled} onChange={v => onChange('giftSubEnabled', v)} />
-            <ToggleField label="Alerte de bits (cheer)" value={values.cheerEnabled} onChange={v => onChange('cheerEnabled', v)} />
+            {ALERT_KINDS.map(({ kind, label }) => (
+                <ModeField
+                    key={kind}
+                    label={label}
+                    value={values.modes[kind]}
+                    options={ALERT_MODES}
+                    onChange={mode => onModeChange(kind, mode)}
+                />
+            ))}
             <div className="field-row">
                 <NumberField
                     label="Bits minimum"

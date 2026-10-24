@@ -9,8 +9,8 @@ const MAX_PENDING = 500;
  * File d'attente des alertes, tenue par le serveur pour que tous les overlays (OBS, aperçu)
  * affichent la même alerte au même moment, et que le panneau puisse la piloter.
  *
- * Un type désactivé dans les réglages est en pause : ses alertes (tests compris) restent
- * en attente sans s'afficher, jusqu'à ce qu'il soit réactivé ou qu'elles soient retirées.
+ * Un type en pause dans les réglages garde ses alertes (tests compris) en attente sans les
+ * afficher, jusqu'à sa reprise ou leur retrait.
  * Émet 'show' (alerte), 'hide' (), et 'change' (state()) à chaque évolution.
  */
 export class AlertQueue extends EventEmitter {
@@ -22,7 +22,7 @@ export class AlertQueue extends EventEmitter {
 
     // getTiming(alert) → { displayMs, durationMs } : durée de la bannière, et durée pendant
     // laquelle l'alerte occupe la file (son compris, au moins displayMs).
-    // isPaused(kind) : type désactivé dans les réglages.
+    // isPaused(kind) : type en pause dans les réglages.
     constructor(getTiming, isPaused) {
         super();
         this.#getTiming = getTiming;
@@ -57,7 +57,7 @@ export class AlertQueue extends EventEmitter {
         this.#changed();
     }
 
-    // À appeler quand les réglages changent : un type réactivé reprend son affichage.
+    // À appeler quand les réglages changent : un type qui sort de pause reprend son affichage.
     refresh() {
         this.#showNext();
         this.#changed();

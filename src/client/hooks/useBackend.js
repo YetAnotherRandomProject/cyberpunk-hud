@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
 const RETRY_DELAY_MS = 3000;
+// Sans aucun message pendant ce délai (le serveur en envoie toutes les 5 s), la connexion est
+// considérée comme morte : on la ferme pour en ouvrir une nouvelle.
+const SILENCE_TIMEOUT_MS = 15000;
 const MAX_CHAT_MESSAGES = 100;
 
 function removeChatMessages(messages, { id, userId }) {
@@ -38,19 +41,54 @@ export function useBackend() {
     useEffect(() => {
         let socket = null;
         let retryTimer = null;
+        let silenceTimer = null;
         let disposed = false;
+        let appVersion = null;
+
+        // Connexion perdue (fermée, ou silencieuse) : nouvelle tentative après un court délai,
+        // et ainsi de suite tant que le serveur reste injoignable.
+        const lost = current => {
+            if (disposed || current !== socket) return;
+            socket = null;
+            clearTimeout(silenceTimer);
+            // Serveur coupé : on vide les métriques pour ne rien afficher de périmé.
+            setConnected(false);
+            setTelemetry(EMPTY_TELEMETRY);
+            setAlertQueue(EMPTY_ALERT_QUEUE);
+            retryTimer = setTimeout(connect, RETRY_DELAY_MS);
+        };
+
+        // Relancé à chaque message. À l'échéance, la connexion est abandonnée sans attendre
+        // son événement de fermeture, qui peut tarder longtemps sur une connexion morte.
+        const watchSilence = current => {
+            clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => {
+                current.onclose = null;
+                current.close();
+                lost(current);
+            }, SILENCE_TIMEOUT_MS);
+        };
 
         const connect = () => {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+            const current = new WebSocket(`${protocol}//${window.location.host}/ws`);
+            socket = current;
+            watchSilence(current);
 
-            socket.onopen = () => setConnected(true);
-            socket.onmessage = event => {
+            current.onopen = () => setConnected(true);
+            current.onmessage = event => {
+                watchSilence(current);
                 const msg = JSON.parse(event.data);
                 switch (msg.type) {
                     case 'INIT':
+                        // Application mise à jour pendant la coupure : la page recharge le nouveau code.
+                        if (appVersion && msg.runtime?.version && msg.runtime.version !== appVersion) {
+                            window.location.reload();
+                            return;
+                        }
+                        appVersion = msg.runtime?.version ?? appVersion;
                         setConfig(msg.config);
-                        setTelemetry(msg.telemetry);
+                        setTelemetry(msg.telemetry ?? EMPTY_TELEMETRY);
                         setTwitchAuth(msg.twitchAuth);
                         // Messages d'avant la connexion : leur âge part de leur heure d'envoi.
                         setChat((msg.chat ?? []).map(m => ({ ...m, receivedAt: m.at })));
@@ -58,7 +96,7 @@ export function useBackend() {
                         setRuntime(msg.runtime);
                         break;
                     case 'TELEMETRY_UPDATE':
-                        setTelemetry(msg.data);
+                        setTelemetry(msg.data ?? EMPTY_TELEMETRY);
                         break;
                     case 'CONFIG_UPDATE':
                         setConfig(msg.data);
@@ -82,20 +120,14 @@ export function useBackend() {
                         break;
                 }
             };
-            socket.onclose = () => {
-                if (disposed) return;
-                // Serveur coupé : on vide les métriques pour ne rien afficher de périmé.
-                setConnected(false);
-                setTelemetry(EMPTY_TELEMETRY);
-                setAlertQueue(EMPTY_ALERT_QUEUE);
-                retryTimer = setTimeout(connect, RETRY_DELAY_MS);
-            };
+            current.onclose = () => lost(current);
         };
 
         connect();
         return () => {
             disposed = true;
             clearTimeout(retryTimer);
+            clearTimeout(silenceTimer);
             socket?.close();
         };
     }, []);

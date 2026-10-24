@@ -104,6 +104,7 @@ export default function SettingsPage({ backend }) {
                     {...sectionProps('alerts')}
                     // « Par défaut » ne touche pas aux sons, qui ont leurs propres boutons.
                     onReset={defaults ? () => setValue('alerts', { ...defaults.alerts, sounds: draft.alerts.sounds }) : null}
+                    onModeChange={(kind, mode) => setValue(['alerts', 'modes', kind], mode)}
                     accountConnected={backend.twitchAuth?.state === 'connected'}
                 />
                 <AlertSoundSettings

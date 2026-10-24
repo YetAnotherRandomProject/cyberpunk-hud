@@ -3,6 +3,17 @@ import OBSWebSocket from 'obs-websocket-js';
 // CPU / RAM viennent du PC entier (SystemSource) et les FPS du jeu (FrameRateSource).
 const OBS_METRICS = ['FRM', 'BIT', 'DRP'];
 const RECONNECT_DELAY_MS = 8000;
+const LOCAL_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]']);
+
+// Source navigateur affichant l'overlay de ce serveur HUD (http://127.0.0.1:<port>/overlay…).
+export function isOverlayUrl(url, port) {
+    try {
+        const parsed = new URL(url);
+        return LOCAL_HOSTS.has(parsed.hostname) && Number(parsed.port) === port && parsed.pathname.startsWith('/overlay');
+    } catch {
+        return false;
+    }
+}
 
 // Connexion à OBS WebSocket v5 et lecture périodique des statistiques réelles.
 export class ObsSource {
@@ -14,9 +25,12 @@ export class ObsSource {
     #pollTimer = null;
     #reconnectTimer = null;
     #lastBytes = null;
+    #getHudPort;
 
-    constructor(state) {
+    // getHudPort() : port actuel du serveur HUD, pour reconnaître les sources de l'overlay.
+    constructor(state, getHudPort = () => null) {
         this.#state = state;
+        this.#getHudPort = getHudPort;
         this.#obs.on('ConnectionClosed', () => {
             if (this.#connected) this.#markDisconnected(null);
             this.#scheduleReconnect();
@@ -84,12 +98,33 @@ export class ObsSource {
 
             const { currentProgramSceneName } = await this.#obs.call('GetCurrentProgramScene');
             this.#state.obs.scene = currentProgramSceneName || null;
+            this.#refreshOverlaySources();
         } catch (err) {
             this.#markDisconnected(describeError(err));
             this.#scheduleReconnect();
         } finally {
             this.#connecting = false;
             this.#state.commit();
+        }
+    }
+
+    /**
+     * Actualise les sources navigateur de l'overlay. Si OBS a démarré avant le HUD, elles
+     * affichent une page d'erreur et, faute de code chargé, ne retenteraient jamais d'elles-mêmes.
+     */
+    async #refreshOverlaySources() {
+        const port = this.#getHudPort();
+        if (!port) return;
+        try {
+            const { inputs } = await this.#obs.call('GetInputList', { inputKind: 'browser_source' });
+            for (const { inputName } of inputs) {
+                const { inputSettings } = await this.#obs.call('GetInputSettings', { inputName });
+                if (!isOverlayUrl(inputSettings.url, port)) continue;
+                await this.#obs.call('PressInputPropertiesButton', { inputName, propertyName: 'refreshnocache' });
+                console.log('[OBS] Source de l\'overlay actualisée :', inputName);
+            }
+        } catch (err) {
+            console.warn('[OBS] Actualisation des sources de l\'overlay impossible :', err.message);
         }
     }
 

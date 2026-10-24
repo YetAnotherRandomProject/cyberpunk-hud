@@ -52,11 +52,9 @@ export const defaultConfig = {
         hiddenUsers: 'nightbot, streamelements, moobot'
     },
     alerts: {
-        followEnabled: true,
-        raidEnabled: true,
-        subEnabled: true,
-        giftSubEnabled: true,
-        cheerEnabled: true,
+        // Mode de chaque type : 'active' (affichée), 'paused' (gardée dans la file sans
+        // s'afficher, jusqu'à la reprise ou au retrait) ou 'off' (ignorée).
+        modes: { follow: 'active', raid: 'active', sub: 'active', giftsub: 'active', cheer: 'active' },
         // Les cheers de moins de bits que ce seuil ne déclenchent pas d'alerte.
         cheerMinBits: 1,
         durationSec: 7,

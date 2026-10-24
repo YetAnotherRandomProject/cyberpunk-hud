@@ -1,0 +1,41 @@
+.mode-field {
+    display: inline-flex;
+    flex-shrink: 0;
+    border: 1px solid var(--ui-border-strong);
+    background: #020608;
+}
+
+.mode-field__option {
+    padding: 3px 9px;
+    background: transparent;
+    border: none;
+    color: var(--ui-text-dim);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.mode-field__option + .mode-field__option {
+    border-left: 1px solid var(--ui-border);
+}
+
+.mode-field__option:hover {
+    color: var(--ui-text);
+}
+
+/* État choisi : vert (actif), orange (pause), gris (coupé). */
+.mode-field__option.is-selected.is-on {
+    background: rgba(38, 255, 104, 0.14);
+    color: var(--ui-ok);
+}
+
+.mode-field__option.is-selected.is-mid {
+    background: rgba(255, 196, 77, 0.14);
+    color: var(--ui-warn);
+}
+
+.mode-field__option.is-selected.is-off {
+    background: rgba(127, 163, 166, 0.16);
+    color: var(--ui-text);
+}

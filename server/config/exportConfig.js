@@ -1,3 +1,5 @@
+import { migrateConfig } from './migrations.js';
+
 // Réglages qui ne doivent jamais quitter le PC : identifiants de l'application Twitch
 // et mot de passe du WebSocket d'OBS.
 const SECRET_PATHS = [
@@ -38,7 +40,7 @@ export function importPatch(file) {
     if (file.formatVersion > 1) {
         throw new Error('Ce fichier vient d\'une version plus récente de Cyberpunk HUD : mettez l\'application à jour.');
     }
-    const patch = structuredClone(file.config);
+    const patch = migrateConfig(structuredClone(file.config));
     for (const [section, key] of SECRET_PATHS) delete patch[section]?.[key];
     for (const section of LOCAL_SECTIONS) delete patch[section];
     return patch;

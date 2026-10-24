@@ -3,6 +3,7 @@ import path from 'node:path';
 import { EventEmitter } from 'node:events';
 import { defaultConfig } from './defaults.js';
 import { conformTo, deepMerge } from '../utils/objects.js';
+import { migrateConfig } from './migrations.js';
 
 // Configuration persistée dans un fichier JSON. Émet 'change' (next, prev) à chaque mise à jour.
 export class ConfigStore extends EventEmitter {
@@ -31,7 +32,7 @@ export class ConfigStore extends EventEmitter {
     #load() {
         if (fs.existsSync(this.#filePath)) {
             try {
-                return conformTo(defaultConfig, JSON.parse(fs.readFileSync(this.#filePath, 'utf-8')));
+                return conformTo(defaultConfig, migrateConfig(JSON.parse(fs.readFileSync(this.#filePath, 'utf-8'))));
             } catch (err) {
                 console.warn(`[CONFIG] Fichier illisible (${err.message}), valeurs par défaut utilisées.`);
             }

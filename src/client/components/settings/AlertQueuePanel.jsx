@@ -17,14 +17,14 @@ function ago(timestamp, now) {
 
 /**
  * Feed des alertes : celle affichée sur l'overlay, et celles en attente (à retirer une par une,
- * celles en pause, ou toutes). Un type désactivé dans la section Alertes est en pause :
- * ses alertes restent en attente sans s'afficher.
+ * celles en pause, ou toutes). Un type en pause dans la section Alertes garde ses alertes
+ * en attente sans les afficher.
  */
 export default function AlertQueuePanel({ queue, settings }) {
     const now = useClock().getTime();
     const [error, setError] = useState(null);
     const { current, pending } = queue;
-    const pausedSet = new Set(ALERT_KINDS.filter(({ setting }) => !settings[setting]).map(({ kind }) => kind));
+    const pausedSet = new Set(ALERT_KINDS.filter(({ kind }) => settings.modes[kind] === 'paused').map(({ kind }) => kind));
     const heldKinds = [...pausedSet].filter(kind => pending.some(alert => alert.kind === kind));
     const heldCount = pending.filter(alert => pausedSet.has(alert.kind)).length;
 
@@ -36,7 +36,7 @@ export default function AlertQueuePanel({ queue, settings }) {
     return (
         <Section
             title="File d'attente"
-            description="Les alertes, tests compris, s'affichent une par une sur tous les overlays (OBS et aperçu). Désactiver un type le met en pause (par exemple les follows pendant une vague de bots) : ses alertes restent ici sans s'afficher, et vous pouvez les retirer."
+            description="Les alertes, tests compris, s'affichent une par une sur tous les overlays (OBS et aperçu). Un type en pause (par exemple les follows pendant une vague de bots) garde ses alertes ici sans les afficher : vous pouvez les retirer avant de le réactiver."
         >
             <div className="alert-queue__current">
                 <span className="alert-queue__heading">À l'écran</span>

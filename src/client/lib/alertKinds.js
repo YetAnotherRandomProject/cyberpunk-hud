@@ -1,11 +1,18 @@
 // Types d'alertes, dans l'ordre d'affichage du panneau.
-// `setting` : interrupteur de l'onglet Alertes (désactivé = alertes en pause dans la file).
+// `label` : réglage du mode dans l'onglet Alertes (alerts.modes[kind]).
 export const ALERT_KINDS = [
-    { kind: 'follow', label: 'Follows', setting: 'followEnabled' },
-    { kind: 'raid', label: 'Raids', setting: 'raidEnabled' },
-    { kind: 'sub', label: 'Subs', setting: 'subEnabled' },
-    { kind: 'giftsub', label: 'Subs offerts', setting: 'giftSubEnabled' },
-    { kind: 'cheer', label: 'Bits', setting: 'cheerEnabled' }
+    { kind: 'follow', label: 'Alerte de follow' },
+    { kind: 'raid', label: 'Alerte de raid' },
+    { kind: 'sub', label: 'Alerte de sub / resub' },
+    { kind: 'giftsub', label: 'Alerte de subs offerts' },
+    { kind: 'cheer', label: 'Alerte de bits (cheer)' }
+];
+
+// Les trois états d'un type d'alerte.
+export const ALERT_MODES = [
+    { value: 'active', label: 'Actif', hint: 'Affichée sur l\'overlay.' },
+    { value: 'paused', label: 'Pause', hint: 'Gardée dans la file sans s\'afficher.' },
+    { value: 'off', label: 'Désactivé', hint: 'Ignorée.' }
 ];
 
 export const ALERT_KIND_LABEL = {

@@ -34,6 +34,8 @@ Dans l'aperçu en direct, on glisse un élément pour le placer ; un clic dessus
 3. Copier l'URL affichée en haut (`http://127.0.0.1:3000/overlay`) dans une **Source navigateur** OBS en 1920×1080.
 4. Laisser l'application ouverte pendant le stream.
 
+Si l'application est fermée ou redémarrée, l'overlay se reconnecte tout seul dès qu'elle revient (y compris après une veille du PC). Si OBS a été lancé avant l'application, celle-ci actualise la source navigateur de l'overlay dès qu'elle se connecte à OBS, et après une mise à jour l'overlay recharge automatiquement la nouvelle version.
+
 Tous les réglages se font dans la fenêtre et sont enregistrés automatiquement dans `%APPDATA%\Cyberpunk HUD\config.json`. L'onglet Système permet d'exporter la configuration de l'overlay et les sons des alertes dans une archive .zip, sans le Client ID, le Client secret Twitch ni le mot de passe OBS, puis de la réimporter : ces secrets et le port du serveur gardent alors leur valeur locale.
 
 ### Mises à jour
@@ -52,7 +54,7 @@ La connexion (jetons) est stockée à part dans `twitch-auth.json`, jamais envoy
 Dans l'onglet Alertes :
 
 - **File d'attente** : les alertes s'affichent une par une. On voit celle à l'écran (bouton « Passer ») et celles en attente, qu'on peut retirer une à une ou par type.
-- **Pause par type** : désactiver un type avec son interrupteur de l'onglet Alertes le met en pause. Pendant une vague de bots, désactiver les follows les garde en attente sans les afficher ; « Retirer celles en pause » les supprime ensuite sans toucher aux autres alertes. Les autres types continuent de s'afficher. Les alertes de test suivent les mêmes règles et s'affichent sur l'overlay OBS.
+- **Trois états par type** (Actif / Pause / Désactivé) : un type en pause garde ses alertes dans la file sans les afficher, un type désactivé les ignore. Pendant une vague de bots, mettre les follows en pause les garde en attente ; « Retirer celles en pause » les supprime ensuite sans toucher aux autres alertes. Les autres types continuent de s'afficher. Les alertes de test suivent les mêmes règles et s'affichent sur l'overlay OBS.
 - **Sons** : un son par type (follow, raid, sub, resub, subs offerts, bits), envoyé depuis le PC (MP3, WAV, OGG, M4A… 10 Mo max), avec son volume. Il est joué par l'overlay dans OBS, et l'alerte suivante attend la fin de l'affichage et du son ; cocher « Contrôler l'audio via OBS » dans la source navigateur pour le passer dans le mixeur. Les sons sont inclus dans l'export .zip.
 
 ### CPU / RAM / FPS

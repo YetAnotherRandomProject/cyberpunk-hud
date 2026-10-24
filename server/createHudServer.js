@@ -1,5 +1,7 @@
+import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ConfigStore } from './config/ConfigStore.js';
 import { TelemetryState } from './telemetry/TelemetryState.js';
 import { ObsSource } from './telemetry/ObsSource.js';
@@ -19,21 +21,21 @@ import { createApp } from './http/createApp.js';
 import { listenWithFallback } from './http/listen.js';
 
 const HOST = '127.0.0.1';
+// Version de l'application : une page ouverte avant une mise à jour se recharge en la voyant changer.
+const APP_VERSION = JSON.parse(fs.readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf-8'
+)).version;
 // Marge pour le démarrage de la lecture du son dans l'overlay.
 const SOUND_START_MARGIN_MS = 300;
 
 // Timing d'une alerte : la bannière reste affichée la durée réglée (displayMs), et l'alerte
 // occupe la file jusqu'à la fin de son son s'il est plus long (durationMs) : l'alerte suivante
 // ne démarre qu'une fois l'affichage et le son terminés.
-// Interrupteurs de l'onglet Alertes : un type désactivé met ses alertes en pause dans la file.
-function alertEnabled(kind, alerts) {
-    return {
-        follow: alerts.followEnabled,
-        raid: alerts.raidEnabled,
-        sub: alerts.subEnabled,
-        giftsub: alerts.giftSubEnabled,
-        cheer: alerts.cheerEnabled
-    }[kind] ?? false;
+// Mode d'un type d'alerte (onglet Alertes) : 'active', 'paused' ou 'off'.
+const ALERT_MODES = ['active', 'paused', 'off'];
+function alertMode(kind, alerts) {
+    const mode = alerts.modes[kind];
+    return ALERT_MODES.includes(mode) ? mode : 'active';
 }
 
 function alertTiming(alert, alerts) {
@@ -57,13 +59,13 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     const configStore = new ConfigStore(path.join(dataDir, 'config.json'));
     const twitchAuth = new TwitchAuth(path.join(dataDir, 'twitch-auth.json'));
     const telemetry = new TelemetryState();
-    const obsSource = new ObsSource(telemetry);
+    const obsSource = new ObsSource(telemetry, () => port);
     const systemSource = new SystemSource(telemetry);
     const frameRateSource = new FrameRateSource(telemetry);
     const soundStore = new SoundStore(path.join(dataDir, 'sounds'));
     const alertQueue = new AlertQueue(
         alert => alertTiming(alert, configStore.get().alerts),
-        kind => !alertEnabled(kind, configStore.get().alerts)
+        kind => alertMode(kind, configStore.get().alerts) === 'paused'
     );
     const recentEvents = new RecentEvents(path.join(dataDir, 'recent-events.json'), telemetry);
     // Les vrais événements mettent à jour les widgets « dernier… », même si leur alerte est désactivée.
@@ -89,10 +91,11 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     let port = null;
 
     // Met une alerte (réelle ou de test) dans la file, comme toutes les autres : elle est envoyée
-    // à tous les overlays, OBS compris, et reste en attente si son type est désactivé.
-    // Seuls les cheers sous le minimum de bits sont ignorés.
+    // à tous les overlays, OBS compris, et reste en attente si son type est en pause.
+    // Un type désactivé, et les cheers sous le minimum de bits, sont ignorés.
     function emitAlert(alert) {
         const { alerts } = configStore.get();
+        if (alertMode(alert.kind, alerts) === 'off') return;
         if (alert.kind === 'cheer' && alert.bits < alerts.cheerMinBits) return;
         alertQueue.push(alert);
     }
@@ -112,7 +115,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
         for (const url of new Set(urls)) mediaCache.get(url).catch(() => {});
     }
 
-    const runtime = () => ({ port, canRestart: Boolean(onRestartRequest) });
+    const runtime = () => ({ port, version: APP_VERSION, canRestart: Boolean(onRestartRequest) });
 
     function applyConfig(config) {
         obsSource.configure(config.obs);
