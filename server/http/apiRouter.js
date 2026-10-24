@@ -98,15 +98,18 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, aler
         res.json(alertQueue.state());
     });
 
-    // --- Sons des alertes : fichier brut, nom d'origine dans l'en-tête X-File-Name.
+    // --- Sons des alertes : fichier brut, nom d'origine dans l'en-tête X-File-Name et durée
+    // mesurée par le navigateur dans X-Duration-Ms (0 si inconnue : le panneau la mesurera).
     router.put('/sounds/:kind', express.raw({ type: () => true, limit: MAX_SOUND_BYTES }), (req, res) => {
         const { kind } = req.params;
         if (!SOUND_KINDS.includes(kind)) return res.status(400).json({ error: 'Type d\'alerte inconnu' });
         try {
             const name = decodeURIComponent(String(req.get('X-File-Name') ?? ''));
+            const measured = Math.round(Number(req.get('X-Duration-Ms')));
+            const durationMs = Number.isFinite(measured) && measured > 0 ? measured : 0;
             const file = soundStore.save(kind, req.body, name);
             const current = configStore.get().alerts.sounds[kind];
-            const next = configStore.update({ alerts: { sounds: { [kind]: { ...current, file, name } } } });
+            const next = configStore.update({ alerts: { sounds: { [kind]: { ...current, file, name, durationMs } } } });
             soundStore.prune(Object.values(next.alerts.sounds).map(sound => sound.file));
             res.json(next);
         } catch (err) {
@@ -118,7 +121,7 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, aler
         const { kind } = req.params;
         if (!SOUND_KINDS.includes(kind)) return res.status(400).json({ error: 'Type d\'alerte inconnu' });
         const current = configStore.get().alerts.sounds[kind];
-        const next = configStore.update({ alerts: { sounds: { [kind]: { ...current, file: '', name: '' } } } });
+        const next = configStore.update({ alerts: { sounds: { [kind]: { ...current, file: '', name: '', durationMs: 0 } } } });
         soundStore.prune(Object.values(next.alerts.sounds).map(sound => sound.file));
         res.json(next);
     });

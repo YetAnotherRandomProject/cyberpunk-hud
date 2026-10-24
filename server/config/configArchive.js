@@ -16,7 +16,7 @@ export function buildArchive(config, soundStore) {
     for (const sound of Object.values(exported.config.alerts.sounds)) {
         const bytes = sound.file ? soundStore.read(sound.file) : null;
         if (bytes) entries[`${SOUNDS_DIR}${sound.file}`] = [bytes, { level: 0 }]; // audio déjà compressé
-        else Object.assign(sound, { file: '', name: '' });
+        else Object.assign(sound, { file: '', name: '', durationMs: 0 });
     }
     entries[CONFIG_ENTRY] = strToU8(JSON.stringify(exported, null, 2));
     return zipSync(entries, { level: 6 });
@@ -56,7 +56,7 @@ export function importArchive(bytes, { configStore, soundStore }) {
                 // Chaque son importé reçoit un nouveau nom : rien n'écrase un fichier existant.
                 patch.alerts.sounds[kind] = data
                     ? { ...sound, file: soundStore.save(kind, data, sound.file) }
-                    : { ...sound, file: '', name: '' };
+                    : { ...sound, file: '', name: '', durationMs: 0 };
             }
         }
     }

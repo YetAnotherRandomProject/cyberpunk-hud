@@ -19,6 +19,7 @@ export class AlertQueue extends EventEmitter {
     #paused = new Set();
     #getDurationMs;
 
+    // getDurationMs(alert) : durée d'affichage de l'alerte, son compris.
     constructor(getDurationMs) {
         super();
         this.#getDurationMs = getDurationMs;
@@ -73,7 +74,7 @@ export class AlertQueue extends EventEmitter {
         if (index < 0) return;
 
         const [alert] = this.#pending.splice(index, 1);
-        const durationMs = this.#getDurationMs();
+        const durationMs = this.#getDurationMs(alert);
         this.#current = { ...alert, shownAt: Date.now(), durationMs };
         this.emit('show', this.#current);
         this.#timer = setTimeout(() => {

@@ -1,10 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { deleteSound, uploadSound } from '../../lib/api.js';
 import { SOUND_KINDS } from '../../lib/alertKinds.js';
+import { measureAudioDuration, measureFileDuration } from '../../lib/audioDuration.js';
 import Section from './Section.jsx';
 import './AlertSoundSettings.css';
 
 const ACCEPT = '.mp3,.wav,.ogg,.oga,.m4a,.aac,.webm,.flac,audio/*';
+
+const formatDuration = ms => `${(ms / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} s`;
 
 function SoundRow({ kind, label, hint, sound, onChange }) {
     const fileRef = useRef(null);
@@ -28,8 +31,22 @@ function SoundRow({ kind, label, hint, sound, onChange }) {
     const handleFile = event => {
         const file = event.target.files?.[0];
         event.target.value = '';
-        if (file) run(() => uploadSound(kind, file));
+        // La durée sert au serveur à attendre la fin du son avant l'alerte suivante.
+        if (file) run(async () => uploadSound(kind, file, await measureFileDuration(file)));
     };
+
+    // Son sans durée connue (envoyé par une version précédente) : mesurée ici une fois pour toutes.
+    useEffect(() => {
+        if (!sound.file || sound.durationMs > 0) return undefined;
+        let cancelled = false;
+        measureAudioDuration(`/sounds/${encodeURIComponent(sound.file)}`).then(durationMs => {
+            if (!cancelled && durationMs > 0) onChange({ ...sound, durationMs });
+        });
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sound.file]);
 
     const preview = () => {
         audioRef.current?.pause();
@@ -45,6 +62,7 @@ function SoundRow({ kind, label, hint, sound, onChange }) {
                 <span className="alert-sound__label">{label}</span>
                 <span className={`alert-sound__file${sound.file ? '' : ' is-empty'}`} title={sound.name}>
                     {sound.file ? sound.name || 'Son personnalisé' : 'Aucun son'}
+                    {sound.file && sound.durationMs > 0 && ` — ${formatDuration(sound.durationMs)}`}
                 </span>
             </div>
             <div className="alert-sound__actions">
@@ -86,7 +104,7 @@ export default function AlertSoundSettings({ sounds, onChange }) {
     return (
         <Section
             title="Sons"
-            description="Joués par l'overlay dans OBS au début de chaque alerte (MP3, WAV, OGG, M4A… 10 Mo maximum). Dans la source navigateur d'OBS, cochez « Contrôler l'audio via OBS » pour régler leur volume dans le mixeur."
+            description="Joués par l'overlay dans OBS au début de chaque alerte (MP3, WAV, OGG, M4A… 10 Mo maximum). Un son plus long que la durée d'affichage prolonge l'alerte : la suivante attend la fin du son. Dans la source navigateur d'OBS, cochez « Contrôler l'audio via OBS » pour régler leur volume dans le mixeur."
         >
             {SOUND_KINDS.map(({ kind, label, hint }) => (
                 <SoundRow

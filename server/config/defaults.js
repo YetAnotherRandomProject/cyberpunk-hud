@@ -61,14 +61,15 @@ export const defaultConfig = {
         cheerMinBits: 1,
         durationSec: 7,
         // Son joué par l'overlay pour chaque type (fichier envoyé par l'utilisateur, dossier sounds).
-        // Le resub retombe sur le son du sub s'il n'a pas le sien.
+        // Le resub retombe sur le son du sub s'il n'a pas le sien. durationMs est mesurée par
+        // le panneau de réglages : l'alerte suivante attend la fin du son.
         sounds: {
-            follow: { file: '', name: '', volume: 0.8 },
-            raid: { file: '', name: '', volume: 0.8 },
-            sub: { file: '', name: '', volume: 0.8 },
-            resub: { file: '', name: '', volume: 0.8 },
-            giftsub: { file: '', name: '', volume: 0.8 },
-            cheer: { file: '', name: '', volume: 0.8 }
+            follow: { file: '', name: '', volume: 0.8, durationMs: 0 },
+            raid: { file: '', name: '', volume: 0.8, durationMs: 0 },
+            sub: { file: '', name: '', volume: 0.8, durationMs: 0 },
+            resub: { file: '', name: '', volume: 0.8, durationMs: 0 },
+            giftsub: { file: '', name: '', volume: 0.8, durationMs: 0 },
+            cheer: { file: '', name: '', volume: 0.8, durationMs: 0 }
         }
     },
     // Textes affichés par chaque élément de l'overlay. Entre accolades, les variables

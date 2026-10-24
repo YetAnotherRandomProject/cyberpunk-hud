@@ -10,10 +10,10 @@ async function send(method, url, { json, file, headers } = {}) {
 }
 
 const request = (method, url, json) => send(method, url, { json });
-// Fichier envoyé brut ; son nom d'origine voyage dans un en-tête.
-const upload = (method, url, file) => send(method, url, {
+// Fichier envoyé brut ; son nom d'origine (et d'autres infos) voyagent dans les en-têtes.
+const upload = (method, url, file, headers = {}) => send(method, url, {
     file,
-    headers: { 'Content-Type': 'application/octet-stream', 'X-File-Name': encodeURIComponent(file.name) }
+    headers: { 'Content-Type': 'application/octet-stream', 'X-File-Name': encodeURIComponent(file.name), ...headers }
 });
 
 export const saveConfig = config => request('PUT', '/api/config', config);
@@ -28,7 +28,7 @@ export const removeQueuedAlert = id => request('DELETE', `/api/alerts/queue/${en
 export const clearQueuedAlerts = (kind = null) => request('DELETE', `/api/alerts/queue${kind ? `?kind=${kind}` : ''}`);
 export const skipAlert = () => request('POST', '/api/alerts/skip');
 export const pauseAlerts = (kind, paused) => request('POST', '/api/alerts/pause', { kind, paused });
-export const uploadSound = (kind, file) => upload('PUT', `/api/sounds/${kind}`, file);
+export const uploadSound = (kind, file, durationMs) => upload('PUT', `/api/sounds/${kind}`, file, { 'X-Duration-Ms': String(durationMs) });
 export const deleteSound = kind => request('DELETE', `/api/sounds/${kind}`);
 export const fetchOpenWindows = () => request('GET', '/api/system/windows');
 export const restartFrameRate = () => request('POST', '/api/system/fps/restart');
