@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { fillTemplate, upper } from '../../lib/format.js';
 import ArasakaKamon from './ArasakaKamon.jsx';
 import './AlertBanner.css';
@@ -48,19 +48,29 @@ export default function AlertBanner({ alert, texts, showPlaceholder }) {
     // Overlay rechargé en cours d'alerte : la barre de progression reprend où elle en est.
     // Calculé une fois par alerte, sinon chaque nouveau rendu ferait sauter la barre.
     const elapsedMs = useMemo(
-        () => (alert ? Math.min(Math.max(0, Date.now() - alert.shownAt), alert.durationMs) : 0),
+        () => (alert ? Math.min(Math.max(0, Date.now() - alert.shownAt), alert.displayMs) : 0),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [alert?.id]
     );
+    // La bannière disparaît après sa durée d'affichage, même si le son de l'alerte continue
+    // (l'alerte suivante attend la fin du son, côté serveur).
+    const [expiredId, setExpiredId] = useState(null);
+    useEffect(() => {
+        if (!alert) return undefined;
+        const timer = setTimeout(() => setExpiredId(alert.id), alert.displayMs - elapsedMs);
+        return () => clearTimeout(timer);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [alert?.id]);
 
-    if (!alert && !showPlaceholder) return null;
-    const view = alert ? { kind: alert.kind, ...PRESENTATION[alert.kind](alert, texts) } : PLACEHOLDER;
+    const shown = alert && alert.id !== expiredId ? alert : null;
+    if (!shown && !showPlaceholder) return null;
+    const view = shown ? { kind: shown.kind, ...PRESENTATION[shown.kind](shown, texts) } : PLACEHOLDER;
 
     return (
         <div
-            key={alert?.id ?? 'placeholder'}
+            key={shown?.id ?? 'placeholder'}
             className={`alert-banner is-${view.kind}`}
-            style={alert ? { '--alert-duration': `${alert.durationMs}ms`, '--alert-elapsed': `${-elapsedMs}ms` } : undefined}
+            style={shown ? { '--alert-duration': `${shown.displayMs}ms`, '--alert-elapsed': `${-elapsedMs}ms` } : undefined}
         >
             <div className="alert-banner__tag">
                 <span className="alert-banner__blink" />

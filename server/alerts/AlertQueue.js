@@ -17,12 +17,13 @@ export class AlertQueue extends EventEmitter {
     #current = null;
     #timer = null;
     #paused = new Set();
-    #getDurationMs;
+    #getTiming;
 
-    // getDurationMs(alert) : durée d'affichage de l'alerte, son compris.
-    constructor(getDurationMs) {
+    // getTiming(alert) → { displayMs, durationMs } : durée de la bannière, et durée pendant
+    // laquelle l'alerte occupe la file (son compris, au moins displayMs).
+    constructor(getTiming) {
         super();
-        this.#getDurationMs = getDurationMs;
+        this.#getTiming = getTiming;
     }
 
     push(alert) {
@@ -74,8 +75,8 @@ export class AlertQueue extends EventEmitter {
         if (index < 0) return;
 
         const [alert] = this.#pending.splice(index, 1);
-        const durationMs = this.#getDurationMs(alert);
-        this.#current = { ...alert, shownAt: Date.now(), durationMs };
+        const { displayMs, durationMs } = this.#getTiming(alert);
+        this.#current = { ...alert, shownAt: Date.now(), displayMs, durationMs };
         this.emit('show', this.#current);
         this.#timer = setTimeout(() => {
             this.#hideCurrent();

@@ -104,7 +104,7 @@ export default function AlertSoundSettings({ sounds, onChange }) {
     return (
         <Section
             title="Sons"
-            description="Joués par l'overlay dans OBS au début de chaque alerte (MP3, WAV, OGG, M4A… 10 Mo maximum). Un son plus long que la durée d'affichage prolonge l'alerte : la suivante attend la fin du son. Dans la source navigateur d'OBS, cochez « Contrôler l'audio via OBS » pour régler leur volume dans le mixeur."
+            description="Joués par l'overlay dans OBS au début de chaque alerte (MP3, WAV, OGG, M4A… 10 Mo maximum). La bannière reste affichée la durée réglée ; si le son est plus long, l'alerte suivante attend la fin du son. Dans la source navigateur d'OBS, cochez « Contrôler l'audio via OBS » pour régler leur volume dans le mixeur."
         >
             {SOUND_KINDS.map(({ kind, label, hint }) => (
                 <SoundRow

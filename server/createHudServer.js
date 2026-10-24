@@ -22,12 +22,14 @@ const HOST = '127.0.0.1';
 // Marge pour le démarrage de la lecture du son dans l'overlay.
 const SOUND_START_MARGIN_MS = 300;
 
-// Une alerte reste affichée sa durée réglée, prolongée jusqu'à la fin de son son s'il est plus long :
-// l'alerte suivante ne démarre qu'une fois l'affichage et le son terminés.
-function alertDurationMs(alert, alerts) {
+// Timing d'une alerte : la bannière reste affichée la durée réglée (displayMs), et l'alerte
+// occupe la file jusqu'à la fin de son son s'il est plus long (durationMs) : l'alerte suivante
+// ne démarre qu'une fois l'affichage et le son terminés.
+function alertTiming(alert, alerts) {
     const displayMs = Math.max(2, alerts.durationSec) * 1000;
     const sound = soundFor(alert, alerts.sounds);
-    return Math.max(displayMs, sound?.durationMs > 0 ? sound.durationMs + SOUND_START_MARGIN_MS : 0);
+    const soundMs = sound?.durationMs > 0 ? sound.durationMs + SOUND_START_MARGIN_MS : 0;
+    return { displayMs, durationMs: Math.max(displayMs, soundMs) };
 }
 const BADGES_TTL_MS = 6 * 60 * 60_000;
 
@@ -48,7 +50,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     const systemSource = new SystemSource(telemetry);
     const frameRateSource = new FrameRateSource(telemetry);
     const soundStore = new SoundStore(path.join(dataDir, 'sounds'));
-    const alertQueue = new AlertQueue(alert => alertDurationMs(alert, configStore.get().alerts));
+    const alertQueue = new AlertQueue(alert => alertTiming(alert, configStore.get().alerts));
     const recentEvents = new RecentEvents(path.join(dataDir, 'recent-events.json'), telemetry);
     // Les vrais événements mettent à jour les widgets « dernier… », même si leur alerte est désactivée.
     const twitchSource = new TwitchSource(telemetry, twitchAuth, alert => {

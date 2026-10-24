@@ -73,7 +73,10 @@ export default function AlertQueuePanel({ queue }) {
                 {current ? (
                     <div className="alert-queue__item is-current">
                         <span className={`alert-queue__tag is-${current.kind}`}>{ALERT_KIND_LABEL[current.kind]}</span>
-                        <span className="alert-queue__text">{describeAlert(current)}{current.test && ' (test)'}</span>
+                        <span className="alert-queue__text">
+                            {describeAlert(current)}{current.test && ' (test)'}
+                            {now - current.shownAt > current.displayMs && <em> — fin du son</em>}
+                        </span>
                         <button type="button" className="ui-button is-secondary is-small" onClick={run(skipAlert)}>Passer</button>
                     </div>
                 ) : (
