@@ -25,6 +25,17 @@ const SOUND_START_MARGIN_MS = 300;
 // Timing d'une alerte : la bannière reste affichée la durée réglée (displayMs), et l'alerte
 // occupe la file jusqu'à la fin de son son s'il est plus long (durationMs) : l'alerte suivante
 // ne démarre qu'une fois l'affichage et le son terminés.
+// Interrupteurs de l'onglet Alertes : un type désactivé met ses alertes en pause dans la file.
+function alertEnabled(kind, alerts) {
+    return {
+        follow: alerts.followEnabled,
+        raid: alerts.raidEnabled,
+        sub: alerts.subEnabled,
+        giftsub: alerts.giftSubEnabled,
+        cheer: alerts.cheerEnabled
+    }[kind] ?? false;
+}
+
 function alertTiming(alert, alerts) {
     const displayMs = Math.max(2, alerts.durationSec) * 1000;
     const sound = soundFor(alert, alerts.sounds);
@@ -50,7 +61,10 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     const systemSource = new SystemSource(telemetry);
     const frameRateSource = new FrameRateSource(telemetry);
     const soundStore = new SoundStore(path.join(dataDir, 'sounds'));
-    const alertQueue = new AlertQueue(alert => alertTiming(alert, configStore.get().alerts));
+    const alertQueue = new AlertQueue(
+        alert => alertTiming(alert, configStore.get().alerts),
+        kind => !alertEnabled(kind, configStore.get().alerts)
+    );
     const recentEvents = new RecentEvents(path.join(dataDir, 'recent-events.json'), telemetry);
     // Les vrais événements mettent à jour les widgets « dernier… », même si leur alerte est désactivée.
     const twitchSource = new TwitchSource(telemetry, twitchAuth, alert => {
@@ -74,17 +88,12 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     let broadcaster = null;
     let port = null;
 
-    // Met une alerte dans la file d'affichage, sauf si ce type est désactivé (`force` pour les tests).
-    function emitAlert(alert, { force = false } = {}) {
+    // Met une alerte (réelle ou de test) dans la file, comme toutes les autres : elle est envoyée
+    // à tous les overlays, OBS compris, et reste en attente si son type est désactivé.
+    // Seuls les cheers sous le minimum de bits sont ignorés.
+    function emitAlert(alert) {
         const { alerts } = configStore.get();
-        const enabled = {
-            follow: alerts.followEnabled,
-            raid: alerts.raidEnabled,
-            sub: alerts.subEnabled,
-            giftsub: alerts.giftSubEnabled,
-            cheer: alerts.cheerEnabled && alert.bits >= alerts.cheerMinBits
-        }[alert.kind];
-        if (!enabled && !force) return;
+        if (alert.kind === 'cheer' && alert.bits < alerts.cheerMinBits) return;
         alertQueue.push(alert);
     }
 
@@ -137,6 +146,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
         chatSource.on('clear', () => broadcaster.broadcast('CHAT_CLEAR', null));
         configStore.on('change', config => {
             applyConfig(config);
+            alertQueue.refresh();
             broadcaster.broadcast('CONFIG_UPDATE', config);
         });
 

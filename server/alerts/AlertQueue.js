@@ -9,21 +9,24 @@ const MAX_PENDING = 500;
  * File d'attente des alertes, tenue par le serveur pour que tous les overlays (OBS, aperçu)
  * affichent la même alerte au même moment, et que le panneau puisse la piloter.
  *
- * Un type en pause garde ses alertes en attente sans les afficher (les tests passent quand même).
+ * Un type désactivé dans les réglages est en pause : ses alertes (tests compris) restent
+ * en attente sans s'afficher, jusqu'à ce qu'il soit réactivé ou qu'elles soient retirées.
  * Émet 'show' (alerte), 'hide' (), et 'change' (state()) à chaque évolution.
  */
 export class AlertQueue extends EventEmitter {
     #pending = [];
     #current = null;
     #timer = null;
-    #paused = new Set();
     #getTiming;
+    #isPaused;
 
     // getTiming(alert) → { displayMs, durationMs } : durée de la bannière, et durée pendant
     // laquelle l'alerte occupe la file (son compris, au moins displayMs).
-    constructor(getTiming) {
+    // isPaused(kind) : type désactivé dans les réglages.
+    constructor(getTiming, isPaused) {
         super();
         this.#getTiming = getTiming;
+        this.#isPaused = isPaused;
     }
 
     push(alert) {
@@ -54,15 +57,14 @@ export class AlertQueue extends EventEmitter {
         this.#changed();
     }
 
-    setPaused(kind, paused) {
-        if (paused) this.#paused.add(kind);
-        else this.#paused.delete(kind);
+    // À appeler quand les réglages changent : un type réactivé reprend son affichage.
+    refresh() {
         this.#showNext();
         this.#changed();
     }
 
     state() {
-        return { current: this.#current, pending: this.#pending, paused: [...this.#paused] };
+        return { current: this.#current, pending: this.#pending, paused: ALERT_KINDS.filter(kind => this.#isPaused(kind)) };
     }
 
     stop() {
@@ -71,7 +73,7 @@ export class AlertQueue extends EventEmitter {
 
     #showNext() {
         if (this.#current) return;
-        const index = this.#pending.findIndex(alert => alert.test || !this.#paused.has(alert.kind));
+        const index = this.#pending.findIndex(alert => !this.#isPaused(alert.kind));
         if (index < 0) return;
 
         const [alert] = this.#pending.splice(index, 1);

@@ -27,7 +27,6 @@ export const sendTestAlert = kind => request('POST', '/api/alerts/test', { kind 
 export const removeQueuedAlert = id => request('DELETE', `/api/alerts/queue/${encodeURIComponent(id)}`);
 export const clearQueuedAlerts = (kind = null) => request('DELETE', `/api/alerts/queue${kind ? `?kind=${kind}` : ''}`);
 export const skipAlert = () => request('POST', '/api/alerts/skip');
-export const pauseAlerts = (kind, paused) => request('POST', '/api/alerts/pause', { kind, paused });
 export const uploadSound = (kind, file, durationMs) => upload('PUT', `/api/sounds/${kind}`, file, { 'X-Duration-Ms': String(durationMs) });
 export const deleteSound = kind => request('DELETE', `/api/sounds/${kind}`);
 export const fetchOpenWindows = () => request('GET', '/api/system/windows');

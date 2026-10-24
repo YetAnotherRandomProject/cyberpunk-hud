@@ -80,7 +80,8 @@ export default function SettingsPage({ backend }) {
     const statuses = serviceStatuses(backend.connected, draft, backend.telemetry);
     const tabs = TABS.map(tab => ({
         ...tab,
-        alert: tab.id === 'alerts' && backend.alertQueue.paused.length > 0
+        // Pastille quand des alertes attendent dans la file parce que leur type est désactivé.
+        alert: tab.id === 'alerts' && backend.alertQueue.pending.some(a => backend.alertQueue.paused.includes(a.kind))
             ? 'warn'
             : worstTone(statuses.filter(s => tab.services.includes(s.id)))
     }));
@@ -98,7 +99,11 @@ export default function SettingsPage({ backend }) {
         ),
         alerts: (
             <>
-                <AlertQueuePanel queue={backend.alertQueue} />
+                <AlertQueuePanel
+                    queue={backend.alertQueue}
+                    settings={draft.alerts}
+                    onToggle={(setting, enabled) => setValue(['alerts', setting], enabled)}
+                />
                 <AlertSettings
                     {...sectionProps('alerts')}
                     // « Par défaut » ne touche pas aux sons, qui ont leurs propres boutons.

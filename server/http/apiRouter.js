@@ -68,7 +68,7 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, aler
     router.post('/alerts/test', (req, res) => {
         const alert = TEST_ALERTS[req.body?.kind];
         if (!alert) return res.status(400).json({ error: 'Type d\'alerte inconnu' });
-        emitAlert({ ...alert, test: true }, { force: true });
+        emitAlert({ ...alert, test: true });
         res.json({ status: 'sent' });
     });
 
@@ -88,13 +88,6 @@ export function createApiRouter({ configStore, twitchAuth, frameRateSource, aler
 
     router.post('/alerts/skip', (req, res) => {
         alertQueue.skip();
-        res.json(alertQueue.state());
-    });
-
-    router.post('/alerts/pause', (req, res) => {
-        const { kind, paused } = req.body ?? {};
-        if (!ALERT_KINDS.includes(kind)) return res.status(400).json({ error: 'Type d\'alerte inconnu' });
-        alertQueue.setPaused(kind, Boolean(paused));
         res.json(alertQueue.state());
     });
 

@@ -26,7 +26,7 @@ export default function AlertSettings({ values, onChange, onReset, accountConnec
         <Section
             title="Alertes"
             description={accountConnected
-                ? 'Follows, raids, subs et bits s\'affichent en direct sur l\'overlay. Subs et bits exigent le compte du streameur.'
+                ? 'Follows, raids, subs et bits s\'affichent en direct sur l\'overlay. Désactiver un type le met en pause : ses alertes attendent dans la file sans s\'afficher. Subs et bits exigent le compte du streameur.'
                 : 'Connectez le compte Twitch (section Twitch) pour recevoir les vraies alertes. Les tests fonctionnent sans.'}
             onReset={onReset}
         >
