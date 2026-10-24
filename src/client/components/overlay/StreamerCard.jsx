@@ -8,7 +8,7 @@ import CardNetPage from './CardNetPage.jsx';
 import './StreamerCard.css';
 
 // Carte streameur double page (bas gauche) : P1 infos du live, P2 courbes temps réel.
-export default function StreamerCard({ hud, theme, telemetry, fallbackName }) {
+export default function StreamerCard({ hud, texts, theme, telemetry, fallbackName }) {
     const [page, selectPage] = useAlternatingPage(hud.cardFlipIntervalSec);
     const { title } = telemetry.streamer;
 
@@ -17,7 +17,7 @@ export default function StreamerCard({ hud, theme, telemetry, fallbackName }) {
             <div className="streamer-card__header">
                 <div className="streamer-card__header-left">
                     <StackedLines count={3} />
-                    <span>CONNECTION {hud.connectionId}</span>
+                    <span>{texts.connection} {hud.connectionId}</span>
                 </div>
                 <PagePills active={page} onSelect={selectPage} />
             </div>
@@ -30,8 +30,8 @@ export default function StreamerCard({ hud, theme, telemetry, fallbackName }) {
 
                 <div className="streamer-card__panel">
                     {page === 1
-                        ? <CardBioPage hud={hud} telemetry={telemetry} fallbackName={fallbackName} />
-                        : <CardNetPage theme={theme} metrics={telemetry.metrics} history={telemetry.history} />}
+                        ? <CardBioPage hud={hud} texts={texts} telemetry={telemetry} fallbackName={fallbackName} />
+                        : <CardNetPage title={texts.plotTitle} theme={theme} metrics={telemetry.metrics} history={telemetry.history} />}
                 </div>
 
                 <div className="streamer-card__accent" />

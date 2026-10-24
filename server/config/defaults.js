@@ -61,6 +61,48 @@ export const defaultConfig = {
         cheerMinBits: 1,
         durationSec: 7
     },
+    // Textes affichés par chaque élément de l'overlay. Entre accolades, les variables
+    // remplacées à l'affichage ; {s} vaut « S » quand le nombre principal dépasse 1.
+    texts: {
+        topCenterTelemetry: { statusLabel: 'SYSTEM STATUS:', online: 'OPTIMAL', offline: 'STANDBY' },
+        bottomLeftModule: {
+            connection: 'CONNECTION',
+            operative: 'OPERATIVE',
+            uptime: 'UPTIME',
+            activity: 'ACTIVITY',
+            scene: 'OBS_SCENE',
+            rank: 'RANK',
+            language: 'LANG',
+            obsLink: 'OBS_LINK',
+            gameLink: 'GAME_LINK',
+            clearance: 'CLEARANCE',
+            linkActive: 'ACTIVE',
+            linkOffline: 'OFFLINE',
+            plotTitle: 'REALTIME_PLOT'
+        },
+        bottomRightTicker: { connection: 'CONNECTION', waiting: 'AWAITING TELEMETRY LINK...' },
+        chatBox: { title: 'NET_CHANNEL // LIVE FEED' },
+        lastSub: { label: 'LAST_SUB // IMPLANT', detail: '{months} MOIS CUMULÉ{s} // T{tier}' },
+        lastGiftSub: { label: 'LAST_GIFT // TRANSFER', detail: '{count} SUB{s} OFFERT{s} // T{tier}', anonymous: 'ANONYME' },
+        lastCheer: { label: 'LAST_BITS // EDDIES', detail: '{bits} BIT{s}', anonymous: 'ANONYME' },
+        lastRaid: { label: 'LAST_RAID // BREACH', detail: '{viewers} NETRUNNER{s}' },
+        lastFollower: { label: 'LAST_FOLLOW // LINK' },
+        alertBanner: {
+            followTag: 'NEW LINK ESTABLISHED',
+            followDetail: 'A REJOINT LE RÉSEAU // FOLLOW',
+            raidTag: 'BREACH DETECTED // INCOMING RAID',
+            raidDetail: '{viewers} NETRUNNER{s} EN APPROCHE',
+            subTag: 'NEW IMPLANT INSTALLED // SUB T{tier}',
+            subDetail: 'REJOINT LA CORPO // SUB',
+            resubTag: 'IMPLANT UPGRADE // RESUB T{tier}',
+            resubDetail: '{months} MOIS DE SERVICE CHEZ ARASAKA',
+            giftTag: 'EDDIES TRANSFER // GIFT SUB T{tier}',
+            giftDetail: 'OFFRE {count} SUB{s} AU RÉSEAU',
+            cheerTag: 'EDDIES INCOMING // CHEER',
+            cheerDetail: '{bits} BIT{s} TRANSFÉRÉ{s}',
+            anonymous: 'NETRUNNER ANONYME'
+        }
+    },
     theme: {
         primary: '#4deeea',
         highlight: '#b8ffff',

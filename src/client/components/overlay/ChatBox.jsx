@@ -20,7 +20,7 @@ const PLACEHOLDER_MESSAGES = [
  * Les nouveaux messages arrivent toujours en bas ; au-delà de `maxMessages` les plus
  * anciens sortent, et chaque message disparaît après `lifetimeSec` (0 = jamais).
  */
-export default function ChatBox({ messages, settings, showPlaceholder }) {
+export default function ChatBox({ messages, settings, title, showPlaceholder }) {
     const { maxMessages, lifetimeSec, growDirection, fontSize, width, showBadges } = settings;
     const now = useClock().getTime();
     const lifetimeMs = lifetimeSec * 1000;
@@ -35,7 +35,7 @@ export default function ChatBox({ messages, settings, showPlaceholder }) {
             <div className="chat-box__panel" style={{ width, fontSize }}>
                 <div className="chat-box__header">
                     <span className="chat-box__dot" />
-                    <span>NET_CHANNEL // LIVE FEED</span>
+                    <span>{title}</span>
                 </div>
                 {visible.map(message => (
                     <ChatMessage

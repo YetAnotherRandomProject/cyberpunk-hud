@@ -3,7 +3,7 @@ import GraphLegendItem from './GraphLegendItem.jsx';
 import './CardNetPage.css';
 
 // Page 2 de la carte : vraies courbes temps réel (CPU %, viewers, temps de rendu ms).
-export default function CardNetPage({ theme, metrics, history }) {
+export default function CardNetPage({ title, theme, metrics, history }) {
     const series = [
         { key: 'FRM', color: theme.negative, minSpread: 0.4, format: v => `${v}ms` },
         { key: 'VWR', color: theme.positive, minSpread: 6, format: v => `${v}` },
@@ -16,7 +16,7 @@ export default function CardNetPage({ theme, metrics, history }) {
     return (
         <div className="card-page">
             <div className="card-net__header">
-                <span>REALTIME_PLOT</span>
+                <span>{title}</span>
                 <div className="card-net__legend">
                     {legend.map(s => <GraphLegendItem key={s.key} label={s.key} color={s.color} />)}
                 </div>

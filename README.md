@@ -19,9 +19,13 @@ En haut à droite, les derniers événements de la chaîne : dernier sub (mois c
 | --- | --- |
 | ![Alerte de resub](docs/screenshots/alert-sub.png) | ![Alerte de raid](docs/screenshots/alert-raid.png) |
 
-Le panneau de réglages : les sections sont rangées par onglets (Sources, Alertes, Tchat, Système, Apparence, Disposition), l'état des services tient dans les cinq pastilles en haut à droite (un clic affiche le détail), et l'aperçu en direct permet de placer les éléments à la souris :
+Le panneau de réglages : les sections sont rangées par onglets (Sources, Alertes, Tchat, Système, Apparence), et l'état des services tient dans les cinq pastilles en haut à droite (un clic affiche le détail).
 
 ![Panneau de réglages](docs/screenshots/settings.png)
+
+Dans l'aperçu en direct, on glisse un élément pour le placer ; un clic dessus ouvre ses réglages dans la colonne de gauche, avec un menu déroulant pour passer d'un élément à l'autre : affichage, position, taille, angle 3D et tous ses textes. Les textes acceptent des variables comme `{viewers}`, `{months}` ou `{bits}`, et `{s}` ajoute le « S » du pluriel :
+
+![Réglages d'un élément : dernier raid](docs/screenshots/settings-element.png)
 
 ## Pour l'utilisateur final
 

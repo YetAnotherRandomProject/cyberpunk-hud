@@ -6,14 +6,13 @@ import SettingsTabs from '../components/settings/SettingsTabs.jsx';
 import OverlayUrlCard from '../components/settings/OverlayUrlCard.jsx';
 import { serviceStatuses } from '../components/settings/StatusPanel.jsx';
 import LayoutPreview from '../components/settings/LayoutPreview.jsx';
+import WidgetPanel from '../components/settings/WidgetPanel.jsx';
 import ObsSettings from '../components/settings/ObsSettings.jsx';
 import SystemSettings from '../components/settings/SystemSettings.jsx';
 import TwitchSettings from '../components/settings/TwitchSettings.jsx';
-import HudTextSettings from '../components/settings/HudTextSettings.jsx';
 import ChatSettings from '../components/settings/ChatSettings.jsx';
 import AlertSettings from '../components/settings/AlertSettings.jsx';
 import ThemeSettings from '../components/settings/ThemeSettings.jsx';
-import WidgetSettings from '../components/settings/WidgetSettings.jsx';
 import ServerSettings from '../components/settings/ServerSettings.jsx';
 import './SettingsPage.css';
 
@@ -23,8 +22,7 @@ const TABS = [
     { id: 'alerts', label: 'Alertes', services: [] },
     { id: 'chat', label: 'Tchat', services: ['chat'] },
     { id: 'system', label: 'Système', services: ['server', 'fps'] },
-    { id: 'look', label: 'Apparence', services: [] },
-    { id: 'layout', label: 'Disposition', services: [] }
+    { id: 'look', label: 'Apparence', services: [] }
 ];
 const TAB_STORAGE_KEY = 'cyberpunk-hud.settings-tab';
 
@@ -49,12 +47,15 @@ export default function SettingsPage({ backend }) {
     const { draft, setValue, saveState } = useConfigDraft(backend.config);
     const [defaults, setDefaults] = useState(null);
     const [activeTab, setActiveTab] = useState(readStoredTab);
+    // Élément de l'overlay dont les réglages remplacent l'onglet courant (null = onglets).
+    const [selectedWidget, setSelectedWidget] = useState(null);
 
     useEffect(() => {
         fetchDefaults().then(setDefaults).catch(() => setDefaults(null));
     }, []);
 
     const selectTab = id => {
+        setSelectedWidget(null);
         setActiveTab(id);
         try {
             localStorage.setItem(TAB_STORAGE_KEY, id);
@@ -103,13 +104,7 @@ export default function SettingsPage({ backend }) {
                 <ServerSettings {...sectionProps('server')} runtime={backend.runtime} />
             </>
         ),
-        look: (
-            <>
-                <HudTextSettings {...sectionProps('hud')} />
-                <ThemeSettings {...sectionProps('theme')} />
-            </>
-        ),
-        layout: <WidgetSettings {...sectionProps('widgets')} />
+        look: <ThemeSettings {...sectionProps('theme')} />
     };
 
     return (
@@ -117,10 +112,22 @@ export default function SettingsPage({ backend }) {
             <SettingsHeader saveState={saveState} connected={backend.connected} statuses={statuses} />
 
             <main className="settings-page__main">
-                <SettingsTabs tabs={tabs} active={activeTab} onSelect={selectTab} />
+                <SettingsTabs tabs={tabs} active={selectedWidget ? null : activeTab} onSelect={selectTab} />
 
                 <div className="settings-page__forms" role="tabpanel">
-                    {panels[activeTab]}
+                    {selectedWidget
+                        ? (
+                            <WidgetPanel
+                                key={selectedWidget}
+                                widgetId={selectedWidget}
+                                config={draft}
+                                defaults={defaults}
+                                setValue={setValue}
+                                onSelect={setSelectedWidget}
+                                onClose={() => setSelectedWidget(null)}
+                            />
+                        )
+                        : panels[activeTab]}
                 </div>
 
                 <div className="settings-page__aside">
@@ -130,7 +137,9 @@ export default function SettingsPage({ backend }) {
                         telemetry={backend.telemetry}
                         alerts={backend.alerts}
                         chat={backend.chat}
-                        onWidgetMove={(id, { x, y }) => setValue(['widgets', id], { ...draft.widgets[id], x, y })}
+                        selectedWidget={selectedWidget}
+                        onWidgetSelect={setSelectedWidget}
+                        onWidgetChange={(id, layout) => setValue(['widgets', id], layout)}
                     />
                 </div>
             </main>

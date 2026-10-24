@@ -3,20 +3,20 @@ import AudioGlyph from './AudioGlyph.jsx';
 import './StockTicker.css';
 
 // Bandeau boursier défilant (bas droite) alimenté par les métriques du PC, d'OBS et de Twitch.
-export default function StockTicker({ hud, telemetry }) {
+export default function StockTicker({ hud, texts, telemetry }) {
     const { BIT, FPS, RAM } = telemetry.metrics;
     const entries = Object.entries(telemetry.metrics);
 
     // Le contenu est rendu deux fois à la suite pour un défilement en boucle sans à-coup.
     const group = entries.length > 0
         ? entries.map(([key, metric]) => <TickerItem key={key} label={key} metric={metric} />)
-        : <div className="ticker-item is-placeholder">AWAITING TELEMETRY LINK...</div>;
+        : <div className="ticker-item is-placeholder">{texts.waiting}</div>;
 
     return (
         <div className="stock-ticker">
             <div className="stock-ticker__top">
                 <AudioGlyph />
-                <div className="stock-ticker__connection">CONNECTION {hud.connectionId}</div>
+                <div className="stock-ticker__connection">{texts.connection} {hud.connectionId}</div>
             </div>
 
             <div className="stock-ticker__main">

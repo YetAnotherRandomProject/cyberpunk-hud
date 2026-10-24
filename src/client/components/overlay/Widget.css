@@ -10,7 +10,26 @@
     touch-action: none;
 }
 
+.hud-widget.is-draggable:hover {
+    outline-color: var(--hud-highlight);
+}
+
 .hud-widget.is-draggable:active {
     cursor: grabbing;
     outline: 2px solid var(--hud-positive);
+}
+
+.hud-widget.is-selected {
+    outline: 3px solid var(--hud-highlight);
+    background: rgba(var(--hud-primary-rgb), 0.12);
+}
+
+/* Élément masqué sur l'overlay : seulement visible dans l'aperçu, en transparence. */
+.hud-widget.is-hidden {
+    opacity: 0.25;
+    filter: grayscale(0.8);
+}
+
+.hud-widget.is-hidden.is-selected {
+    opacity: 0.55;
 }

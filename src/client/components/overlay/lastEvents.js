@@ -1,40 +1,39 @@
-// Widgets « dernier… » de l'overlay. `read` extrait l'événement de la télémétrie
-// et le met en forme ({ name, detail }), ou retourne null s'il n'y en a pas encore.
-const plural = (count, singular, pluralForm = `${singular}S`) => `${count} ${count > 1 ? pluralForm : singular}`;
-const anonymous = name => name || 'ANONYME';
+import { fillTemplate } from '../../lib/format.js';
 
-const format = (event, describe) => (event ? describe(event) : null);
-
+// Widgets « dernier… » de l'overlay. `read(streamer, texts)` extrait l'événement de la
+// télémétrie et le met en forme avec les textes réglables ({ name, detail }),
+// ou retourne null s'il n'y en a pas encore.
 export const LAST_EVENTS = [
     {
         id: 'lastSub',
-        label: 'LAST_SUB // IMPLANT',
-        read: s => format(s.lastSub, e => ({
-            name: e.name,
-            detail: `${plural(e.months ?? 1, 'MOIS', 'MOIS')} CUMULÉ${e.months > 1 ? 'S' : ''} // T${e.tier ?? 1}`
-        }))
+        read: (s, t) => s.lastSub && {
+            name: s.lastSub.name,
+            detail: fillTemplate(t.detail, { tier: 1, ...s.lastSub }, s.lastSub.months)
+        }
     },
     {
         id: 'lastGiftSub',
-        label: 'LAST_GIFT // TRANSFER',
-        read: s => format(s.lastGiftSub, e => ({
-            name: anonymous(e.name),
-            detail: `${plural(e.count ?? 1, 'SUB OFFERT', 'SUBS OFFERTS')} // T${e.tier ?? 1}`
-        }))
+        read: (s, t) => s.lastGiftSub && {
+            name: s.lastGiftSub.name || t.anonymous,
+            detail: fillTemplate(t.detail, { tier: 1, ...s.lastGiftSub }, s.lastGiftSub.count)
+        }
     },
     {
         id: 'lastCheer',
-        label: 'LAST_BITS // EDDIES',
-        read: s => format(s.lastCheer, e => ({ name: anonymous(e.name), detail: plural(e.bits, 'BIT') }))
+        read: (s, t) => s.lastCheer && {
+            name: s.lastCheer.name || t.anonymous,
+            detail: fillTemplate(t.detail, s.lastCheer, s.lastCheer.bits)
+        }
     },
     {
         id: 'lastRaid',
-        label: 'LAST_RAID // BREACH',
-        read: s => format(s.lastRaid, e => ({ name: e.name, detail: plural(e.viewers ?? 0, 'NETRUNNER') }))
+        read: (s, t) => s.lastRaid && {
+            name: s.lastRaid.name,
+            detail: fillTemplate(t.detail, s.lastRaid, s.lastRaid.viewers)
+        }
     },
     {
         id: 'lastFollower',
-        label: 'LAST_FOLLOW // LINK',
-        read: s => format(s.lastFollower, e => ({ name: e.name, detail: null }))
+        read: s => s.lastFollower && { name: s.lastFollower.name, detail: null }
     }
 ];

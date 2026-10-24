@@ -6,7 +6,7 @@ import './TopCenterTelemetry.css';
 const MINI_BARCODE = [2, 1, 3, 1, 2, 1, 2, 3, 1, 2, 1, 2];
 
 // Barre de statut système Kiroshi (haut centre).
-export default function TopCenterTelemetry({ hud, telemetry }) {
+export default function TopCenterTelemetry({ hud, texts, telemetry }) {
     const now = useClock();
     const { category, isLive } = telemetry.streamer;
     const isOnline = Boolean(telemetry.obsConnected || isLive);
@@ -20,7 +20,7 @@ export default function TopCenterTelemetry({ hud, telemetry }) {
                         <span style={{ height: 6 }} />
                         <span style={{ height: 8 }} />
                     </div>
-                    <span>SYSTEM STATUS:</span>
+                    <span>{texts.statusLabel}</span>
                 </div>
                 <div className="top-telemetry__serial">{hud.serialNumber}</div>
                 <div className="top-telemetry__right">
@@ -30,7 +30,7 @@ export default function TopCenterTelemetry({ hud, telemetry }) {
             </div>
             <div className="top-telemetry__sub">
                 <span>
-                    {isOnline ? 'OPTIMAL' : 'STANDBY'}
+                    {isOnline ? texts.online : texts.offline}
                     {category && <span> // {upper(category)}</span>}
                 </span>
                 <span className="top-telemetry__clock">{formatHudClock(now, hud.yearPrefix)}</span>
