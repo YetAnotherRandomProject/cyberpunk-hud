@@ -1,0 +1,24 @@
+.system-settings__picker {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px;
+}
+
+.system-settings__status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.system-settings__help {
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--ui-text-dim);
+}
+
+.system-settings__error {
+    font-size: 13px;
+    color: var(--ui-error);
+}

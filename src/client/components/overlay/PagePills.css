@@ -1,0 +1,21 @@
+.page-pills {
+    display: flex;
+    gap: 4px;
+    font-size: 9px;
+}
+
+.page-pills__pill {
+    padding: 1px 5px;
+    border: 1px solid var(--hud-primary-dim);
+    opacity: 0.45;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.page-pills__pill.is-active {
+    opacity: 1;
+    background: rgba(var(--hud-primary-rgb), 0.22);
+    border-color: var(--hud-primary);
+    color: var(--hud-highlight);
+    box-shadow: 0 0 6px rgba(var(--hud-primary-rgb), 0.4);
+}

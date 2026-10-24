@@ -1,0 +1,30 @@
+.telemetry-graph {
+    position: relative;
+    flex: 1;
+    margin: 5px 0;
+    border: 1px solid rgba(var(--hud-primary-rgb), 0.3);
+    background:
+            linear-gradient(rgba(var(--hud-primary-rgb), 0.08) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--hud-primary-rgb), 0.08) 1px, transparent 1px),
+            rgba(2, 12, 16, 0.55);
+    background-size: 16px 16px;
+    overflow: hidden;
+}
+
+.telemetry-graph canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.telemetry-graph__empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    opacity: 0.65;
+    letter-spacing: 1px;
+}

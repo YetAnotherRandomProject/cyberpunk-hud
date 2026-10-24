@@ -1,0 +1,35 @@
+.twitch-settings__api {
+    border-top: 1px solid var(--ui-border);
+    padding-top: 10px;
+}
+
+.twitch-settings__api[open] > summary {
+    margin-bottom: 10px;
+}
+
+.twitch-settings__api > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ui-accent);
+}
+
+.twitch-settings__api > .field + .field {
+    margin-top: 12px;
+}
+
+.twitch-settings__help {
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ui-text-dim);
+    margin-bottom: 12px;
+}
+
+.twitch-settings__help a {
+    color: var(--ui-accent);
+}
+
+.twitch-settings__help code {
+    font-family: var(--font-mono);
+    color: var(--ui-text);
+}

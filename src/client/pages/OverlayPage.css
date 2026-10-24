@@ -1,0 +1,7 @@
+html.overlay-document,
+html.overlay-document body {
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: transparent;
+}

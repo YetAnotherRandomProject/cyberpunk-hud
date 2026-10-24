@@ -1,0 +1,92 @@
+.stock-ticker {
+    width: 455px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stock-ticker__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 18px 4px 6px;
+    border-bottom: 1px solid var(--hud-primary-dim);
+}
+
+.stock-ticker__connection {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    opacity: 0.85;
+}
+
+.stock-ticker__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, transparent 0%, var(--hud-primary-bg) 10%, var(--hud-primary-bg) 92%, transparent 100%);
+    border-bottom: 1px solid var(--hud-primary);
+    padding: 6px 8px;
+    gap: 8px;
+    min-height: 39px;
+}
+
+.stock-ticker__bracket {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    opacity: 0.75;
+    flex-shrink: 0;
+}
+
+.stock-ticker__viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.stock-ticker__track {
+    display: flex;
+    width: max-content;
+    animation: stock-ticker-scroll 20s linear infinite;
+}
+
+.stock-ticker__group {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding-right: 28px;
+}
+
+@keyframes stock-ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.stock-ticker__side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    font-family: var(--font-mono);
+    font-size: 7px;
+    line-height: 1;
+    opacity: 0.75;
+    flex-shrink: 0;
+}
+
+.stock-ticker__mini-graph {
+    width: 16px;
+    height: 14px;
+    border: 1px solid var(--hud-primary);
+    display: flex;
+    align-items: flex-end;
+    gap: 1px;
+    padding: 1px;
+}
+
+.stock-ticker__mini-graph span {
+    flex: 1;
+    background: var(--hud-primary);
+}

@@ -1,0 +1,10 @@
+.server-settings__notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border: 1px solid var(--ui-warn);
+    color: var(--ui-warn);
+    font-size: 13px;
+    line-height: 1.4;
+}

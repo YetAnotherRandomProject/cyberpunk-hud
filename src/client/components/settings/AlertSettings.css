@@ -1,0 +1,16 @@
+.alert-settings__tests {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-settings__tests-label {
+    font-size: 13px;
+    color: var(--ui-text-dim);
+}
+
+.alert-settings__error {
+    font-size: 13px;
+    color: var(--ui-error);
+}

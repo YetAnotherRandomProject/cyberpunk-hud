@@ -1,0 +1,10 @@
+.save-indicator {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.save-indicator.is-dim { color: var(--ui-text-dim); }
+.save-indicator.is-warn { color: var(--ui-warn); }
+.save-indicator.is-ok { color: var(--ui-ok); }
+.save-indicator.is-error { color: var(--ui-error); }

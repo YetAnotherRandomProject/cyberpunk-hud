@@ -1,0 +1,11 @@
+.graph-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.graph-legend-item__dot {
+    width: 6px;
+    height: 6px;
+    display: inline-block;
+}

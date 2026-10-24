@@ -1,0 +1,10 @@
+.stacked-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stacked-lines span {
+    height: 2px;
+    background: var(--hud-primary);
+}

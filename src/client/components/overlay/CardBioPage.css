@@ -1,0 +1,59 @@
+.card-bio__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.card-bio__data {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    line-height: 1.35;
+    opacity: 0.92;
+    text-transform: uppercase;
+}
+
+.card-bio__name {
+    color: var(--hud-highlight);
+    font-weight: bold;
+    font-size: 10.5px;
+}
+
+.card-bio__brand {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.card-bio__brand svg {
+    width: 17px;
+    height: 17px;
+}
+
+.card-bio__mid {
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    line-height: 1.35;
+    opacity: 0.85;
+    border-left: 2px solid var(--hud-primary);
+    padding-left: 6px;
+}
+
+.card-bio__barcode {
+    width: 85%;
+    height: 26px;
+    display: flex;
+    align-items: stretch;
+    gap: 1.5px;
+    padding: 3px;
+    border: 1px solid var(--hud-primary-dim);
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.card-bio__barcode span {
+    background-color: var(--hud-primary);
+    box-shadow: 0 0 4px var(--hud-primary);
+}

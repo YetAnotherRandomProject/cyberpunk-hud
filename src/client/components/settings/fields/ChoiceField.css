@@ -1,0 +1,25 @@
+.choice-field {
+    display: flex;
+    border: 1px solid var(--ui-border-strong);
+}
+
+.choice-field__option {
+    flex: 1;
+    padding: 7px 10px;
+    background: #020608;
+    border: none;
+    color: var(--ui-text-dim);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.choice-field__option + .choice-field__option {
+    border-left: 1px solid var(--ui-border-strong);
+}
+
+.choice-field__option.is-selected {
+    background: rgba(77, 238, 234, 0.18);
+    color: var(--ui-accent);
+}

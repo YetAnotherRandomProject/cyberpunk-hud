@@ -1,0 +1,42 @@
+# Chaque push sur main publie une release GitHub avec l'installeur Windows.
+# Les applications installées la détectent (latest.yml) et se mettent à jour toutes seules.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Deux pushes rapprochés : les releases sont publiées l'une après l'autre, jamais en parallèle.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Version = majeure.mineure de package.json + numéro du build (2.0.0 → 2.0.<run>),
+      # pour que chaque release soit plus récente que la précédente.
+      - name: Numéro de version
+        shell: bash
+        run: |
+          base=$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')")
+          npm version "$base.${{ github.run_number }}" --no-git-tag-version
+
+      - name: Installeur et publication
+        run: npm run release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,16 @@
+.hud-widget {
+    position: absolute;
+    transform-origin: top left;
+}
+
+.hud-widget.is-draggable {
+    cursor: grab;
+    outline: 1px dashed rgba(var(--hud-primary-rgb), 0.6);
+    background: rgba(var(--hud-primary-rgb), 0.05);
+    touch-action: none;
+}
+
+.hud-widget.is-draggable:active {
+    cursor: grabbing;
+    outline: 2px solid var(--hud-positive);
+}

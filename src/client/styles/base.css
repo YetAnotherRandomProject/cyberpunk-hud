@@ -1,0 +1,28 @@
+/* Polices embarquées : l'overlay fonctionne sans connexion à Google Fonts. */
+@import '@fontsource/orbitron/latin-600.css';
+@import '@fontsource/orbitron/latin-800.css';
+@import '@fontsource/orbitron/latin-900.css';
+@import '@fontsource/rajdhani/latin-500.css';
+@import '@fontsource/rajdhani/latin-600.css';
+@import '@fontsource/rajdhani/latin-700.css';
+@import '@fontsource/share-tech-mono/latin-400.css';
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+}
+
+html, body, #root {
+    height: 100%;
+}
+
+.hidden {
+    display: none !important;
+}

@@ -1,0 +1,21 @@
+.top-left-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0.92;
+}
+
+.top-left-brand__symbol {
+    width: 42px;
+    height: 42px;
+    filter: drop-shadow(0 0 6px var(--hud-primary));
+}
+
+.top-left-brand__wordmark {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 27px;
+    letter-spacing: 3px;
+    text-transform: lowercase;
+    line-height: 1;
+}

@@ -1,0 +1,32 @@
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--ui-border-strong);
+    background: var(--ui-panel);
+}
+
+.settings-header__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--ui-accent);
+}
+
+.settings-header__title small {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--ui-text-dim);
+}
+
+.settings-header__logo {
+    width: 28px;
+    height: 28px;
+}

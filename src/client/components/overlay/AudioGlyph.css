@@ -1,0 +1,43 @@
+.audio-glyph {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.audio-glyph__ring {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--hud-primary);
+}
+
+.audio-glyph__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--hud-primary);
+}
+
+.audio-glyph__bars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 14px;
+    margin-left: 2px;
+}
+
+.audio-glyph__bars span {
+    width: 2px;
+    background: var(--hud-primary);
+    animation: audio-glyph-bounce 1.2s infinite ease-in-out;
+}
+
+.audio-glyph__bars span:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+.audio-glyph__bars span:nth-child(2) { height: 12px; animation-delay: 0.3s; }
+.audio-glyph__bars span:nth-child(3) { height: 8px; animation-delay: 0.2s; }
+.audio-glyph__bars span:nth-child(4) { height: 14px; animation-delay: 0.4s; }
+
+@keyframes audio-glyph-bounce {
+    0%, 100% { transform: scaleY(0.45); }
+    50% { transform: scaleY(1); }
+}

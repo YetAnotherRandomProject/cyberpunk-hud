@@ -1,0 +1,72 @@
+.top-telemetry {
+    width: 540px;
+    opacity: 0.88;
+}
+
+.top-telemetry__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--hud-primary);
+    box-shadow: 0 2px 6px -2px var(--hud-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.top-telemetry__left,
+.top-telemetry__right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.top-telemetry__right {
+    gap: 8px;
+}
+
+.top-telemetry__bars {
+    display: inline-flex;
+    gap: 2px;
+    height: 10px;
+    align-items: flex-end;
+}
+
+.top-telemetry__bars span {
+    width: 2px;
+    background: var(--hud-primary);
+}
+
+.top-telemetry__serial {
+    letter-spacing: 1.5px;
+    color: var(--hud-highlight);
+}
+
+.top-telemetry__barcode {
+    display: flex;
+    align-items: center;
+    height: 11px;
+    gap: 1px;
+}
+
+.top-telemetry__barcode span {
+    height: 100%;
+    background: var(--hud-primary);
+}
+
+.top-telemetry__sub {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 4px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+}
+
+.top-telemetry__clock {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    opacity: 0.75;
+}

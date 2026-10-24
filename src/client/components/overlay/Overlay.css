@@ -1,0 +1,29 @@
+.hud-root {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: var(--hud-primary);
+    user-select: none;
+    text-shadow:
+            -1px 0 1px rgba(255, 0, 85, 0.45),
+            1px 0 1px rgba(var(--hud-primary-rgb), 0.65),
+            0 0 8px rgba(var(--hud-primary-rgb), 0.55);
+
+    --hud-primary-dim: rgba(var(--hud-primary-rgb), 0.28);
+    --hud-primary-bg: rgba(8, 32, 39, 0.45);
+}
+
+.hud-root.is-editing {
+    background:
+            linear-gradient(rgba(var(--hud-primary-rgb), 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(var(--hud-primary-rgb), 0.04) 1px, transparent 1px),
+            radial-gradient(circle at center, #18252c 0%, #070b0e 100%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+}
+
+@keyframes hud-pulse-opacity {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}

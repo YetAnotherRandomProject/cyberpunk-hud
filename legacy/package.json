@@ -1,0 +1,15 @@
+{
+  "name": "cyberpunk-2077-obs-hud",
+  "version": "1.0.0",
+  "description": "Overlay HUD Cyberpunk 2077 Arasaka/Kiroshi avec télémétrie Twitch & OBS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "obs-websocket-js": "^5.0.5",
+    "ws": "^8.17.0"
+  }
+}

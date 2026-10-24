@@ -1,0 +1,53 @@
+.twitch-connect {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid var(--ui-border);
+    background: var(--ui-panel-raised);
+    font-size: 14px;
+}
+
+.twitch-connect.is-pending {
+    align-items: flex-start;
+    border-color: var(--ui-accent);
+}
+
+.twitch-connect__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.twitch-connect__row strong {
+    color: var(--ui-accent);
+}
+
+.twitch-connect__login {
+    background: #9146ff;
+    border-color: #9146ff;
+    color: #fff;
+    padding: 10px 14px;
+}
+
+.twitch-connect__code {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: 6px;
+    color: var(--ui-accent);
+    user-select: all;
+}
+
+.twitch-connect__hint {
+    font-size: 12px;
+    color: var(--ui-text-dim);
+}
+
+.twitch-connect__error {
+    font-size: 13px;
+    color: var(--ui-error);
+}

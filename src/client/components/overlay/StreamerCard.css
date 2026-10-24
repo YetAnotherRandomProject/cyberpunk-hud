@@ -1,0 +1,118 @@
+.streamer-card {
+    width: 325px;
+}
+
+.streamer-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    padding-right: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    opacity: 0.9;
+}
+
+.streamer-card__header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.streamer-card__body {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.streamer-card__side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 4px;
+}
+
+.streamer-card__globe {
+    width: 22px;
+    height: 22px;
+    animation: hud-pulse-opacity 4s infinite ease-in-out;
+}
+
+.streamer-card__panel {
+    position: relative;
+    flex: 1;
+    height: 158px;
+    background: var(--hud-primary-bg);
+    border: 1px solid var(--hud-primary);
+    padding: 11px 14px 10px;
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+    box-shadow: inset 0 0 18px rgba(var(--hud-primary-rgb), 0.18);
+    overflow: hidden;
+}
+
+.streamer-card__panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 26px;
+    height: 26px;
+    border-bottom: 2px solid var(--hud-primary);
+    transform: rotate(45deg) translate(6px, -13px);
+}
+
+.streamer-card__accent {
+    width: 5px;
+    height: 115px;
+    background: var(--hud-highlight);
+    box-shadow: 0 0 10px var(--hud-primary);
+    align-self: center;
+    clip-path: polygon(0 0, 100% 8%, 100% 92%, 0 100%);
+}
+
+.streamer-card__footer {
+    margin-top: 5px;
+    padding-left: 30px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    letter-spacing: 0.8px;
+    opacity: 0.85;
+}
+
+.streamer-card__footer-box {
+    border: 1px solid var(--hud-primary);
+    padding: 1px 4px;
+    font-size: 7.5px;
+}
+
+/* Transition « glitch » commune aux deux pages de la carte */
+.card-page {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    animation: card-page-glitch-in 0.28s ease-out;
+}
+
+@keyframes card-page-glitch-in {
+    0% {
+        opacity: 0.2;
+        transform: translateX(-6px) skewX(8deg);
+        filter: drop-shadow(4px 0 var(--hud-negative));
+    }
+    50% {
+        opacity: 0.85;
+        transform: translateX(3px) skewX(-4deg);
+    }
+    100% {
+        opacity: 1;
+        transform: none;
+        filter: none;
+    }
+}

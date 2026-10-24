@@ -1,0 +1,26 @@
+.layout-preview__label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--ui-text-dim);
+}
+
+.layout-preview__frame {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--ui-border-strong);
+    flex-shrink: 0;
+}
+
+.layout-preview__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+}

@@ -1,0 +1,26 @@
+.chat-emote__image {
+    height: 1.75em;
+    width: auto;
+    margin: -0.3em 2px;
+    vertical-align: middle;
+}
+
+.chat-emote__stack {
+    position: relative;
+    display: inline-grid;
+    vertical-align: middle;
+    margin: -0.3em 2px;
+}
+
+/* Toutes les images de la pile occupent la même cellule, centrées */
+.chat-emote__stack > .chat-emote__image {
+    grid-area: 1 / 1;
+    justify-self: center;
+    align-self: center;
+    margin: 0;
+}
+
+.chat-emote__fallback {
+    font-style: italic;
+    opacity: 0.85;
+}

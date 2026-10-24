@@ -1,0 +1,83 @@
+{
+  "name": "cyberpunk-hud",
+  "productName": "Cyberpunk HUD",
+  "version": "2.0.0",
+  "description": "Overlay HUD Cyberpunk 2077 Arasaka/Kiroshi avec télémétrie Twitch & OBS",
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c cyan,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "node --watch-path=server server/standalone.js",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "vite build && node server/standalone.js",
+    "app": "vite build && electron .",
+    "dist": "vite build && electron-builder --win --publish never",
+    "release": "vite build && electron-builder --win --publish always"
+  },
+  "author": "YetAnotherRandomProject",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YetAnotherRandomProject/cyberpunk-hud.git"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.10",
+    "express": "^4.19.2",
+    "koffi": "3.3.2",
+    "obs-websocket-js": "^5.0.5",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@fontsource/orbitron": "^5.1.1",
+    "@fontsource/rajdhani": "^5.1.1",
+    "@fontsource/share-tech-mono": "^5.1.1",
+    "@vitejs/plugin-react": "4.7.0",
+    "concurrently": "9.1.2",
+    "electron": "33.4.11",
+    "electron-builder": "25.1.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "vite": "5.4.21"
+  },
+  "build": {
+    "appId": "fr.ocelus.cyberpunkhud",
+    "productName": "Cyberpunk HUD",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**",
+      "server/**",
+      "dist/client/**",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "server/telemetry/system/**",
+      "node_modules/koffi/**",
+      "node_modules/@koromix/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "artifactName": "CyberpunkHUD-Setup-${version}.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YetAnotherRandomProject",
+        "repo": "cyberpunk-hud",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "allowScripts": {
+    "electron@33.4.11": true,
+    "esbuild@0.21.5": true
+  }
+}

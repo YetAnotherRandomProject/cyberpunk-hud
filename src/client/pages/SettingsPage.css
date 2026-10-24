@@ -1,0 +1,100 @@
+:root {
+    --ui-bg: #05090b;
+    --ui-panel: #0a1418;
+    --ui-panel-raised: #0f1d22;
+    --ui-border: rgba(77, 238, 234, 0.22);
+    --ui-border-strong: rgba(77, 238, 234, 0.55);
+    --ui-text: #d7f7f6;
+    --ui-text-dim: #7fa3a6;
+    --ui-accent: #4deeea;
+    --ui-accent-ink: #041217;
+    --ui-ok: #26ff68;
+    --ui-warn: #ffc44d;
+    --ui-error: #ff334b;
+}
+
+body {
+    background: var(--ui-bg);
+    color: var(--ui-text);
+    font-family: var(--font-body);
+    font-size: 15px;
+}
+
+.settings-loading {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-family: var(--font-mono);
+    color: var(--ui-text-dim);
+    letter-spacing: 1px;
+}
+
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.settings-page__main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(360px, 440px) 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.settings-page__forms,
+.settings-page__aside {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 4px;
+}
+
+@media (max-width: 960px) {
+    .settings-page__main {
+        grid-template-columns: 1fr;
+        overflow-y: auto;
+    }
+
+    .settings-page__forms,
+    .settings-page__aside {
+        overflow: visible;
+    }
+
+    .settings-page__aside {
+        order: -1;
+    }
+}
+
+/* Boutons partagés par les composants du panneau */
+.ui-button {
+    padding: 7px 14px;
+    background: var(--ui-accent);
+    color: var(--ui-accent-ink);
+    border: 1px solid var(--ui-accent);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ui-button:hover {
+    filter: brightness(1.15);
+}
+
+.ui-button.is-secondary {
+    background: transparent;
+    color: var(--ui-accent);
+}
+
+.ui-button.is-small {
+    padding: 3px 8px;
+    font-size: 9px;
+}

@@ -1,0 +1,52 @@
+/* Ancre de hauteur nulle : le panneau s'y accroche par le bas (grandit vers le haut)
+   ou par le haut (grandit vers le bas). */
+.chat-box {
+    position: relative;
+    height: 0;
+}
+
+.chat-box__panel {
+    position: absolute;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    text-shadow: none;
+}
+
+.chat-box.is-grow-up .chat-box__panel {
+    bottom: 0;
+}
+
+.chat-box.is-grow-down .chat-box__panel {
+    top: 0;
+}
+
+.hud-widget.is-draggable .chat-box__panel {
+    outline: 1px dashed rgba(var(--hud-primary-rgb), 0.6);
+}
+
+.chat-box__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 4px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid var(--hud-primary);
+    box-shadow: 0 2px 6px -2px var(--hud-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: var(--hud-primary);
+    text-shadow: 0 0 6px rgba(var(--hud-primary-rgb), 0.6);
+}
+
+.chat-box__dot {
+    width: 7px;
+    height: 7px;
+    background: var(--hud-negative);
+    box-shadow: 0 0 6px var(--hud-negative);
+    animation: hud-pulse-opacity 1.6s infinite ease-in-out;
+}

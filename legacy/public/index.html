@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+    <title>Cyberpunk 2077 - Arasaka Stream HUD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --hud-cyan: #4deeea;
+            --hud-cyan-bright: #b8ffff;
+            --hud-cyan-dim: rgba(77, 238, 234, 0.28);
+            --hud-cyan-bg: rgba(8, 32, 39, 0.45);
+            --hud-green: #26ff68;
+            --hud-red: #ff334b;
+            --chromatic-glow:
+                    -1px 0px 1px rgba(255, 0, 85, 0.45),
+                    1px 0px 1px rgba(0, 217, 255, 0.65),
+                    0 0 8px rgba(77, 238, 234, 0.55);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            background-color: transparent;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--hud-cyan);
+            text-shadow: var(--chromatic-glow);
+            position: relative;
+        }
+
+        body.debug-bg {
+            background:
+                    linear-gradient(rgba(77, 238, 234, 0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(77, 238, 234, 0.04) 1px, transparent 1px),
+                    radial-gradient(circle at center, #18252c 0%, #070b0e 100%);
+            background-size: 40px 40px, 40px 40px, 100% 100%;
+        }
+
+        .hud-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .hud-widget {
+            position: absolute;
+            transform-origin: top left;
+            transition: box-shadow 0.15s ease;
+        }
+
+        body.edit-mode .hud-widget {
+            cursor: grab;
+            outline: 1px dashed rgba(77, 238, 234, 0.6);
+            background: rgba(77, 238, 234, 0.05);
+            padding: 6px;
+        }
+
+        body.edit-mode .hud-widget:active {
+            cursor: grabbing;
+            outline: 2px solid var(--hud-green);
+        }
+
+        .scanlines {
+            background: linear-gradient(
+                    to bottom,
+                    rgba(255,255,255,0),
+                    rgba(255,255,255,0) 50%,
+                    rgba(77, 238, 234, 0.08) 50%,
+                    rgba(77, 238, 234, 0.08)
+            );
+            background-size: 100% 4px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* =========================================================
+           1. HAUT GAUCHE : LOGO ARASAKA
+           ========================================================= */
+        #topLeftBrand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.92;
+        }
+
+        .arasaka-symbol {
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 0 6px var(--hud-cyan));
+        }
+
+        .arasaka-wordmark {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 27px;
+            letter-spacing: 3px;
+            text-transform: lowercase;
+            color: var(--hud-cyan);
+            line-height: 1;
+        }
+
+        /* =========================================================
+           2. HAUT CENTRE : BARRE TÉLÉMÉTRIQUE KIROSHI
+           ========================================================= */
+        #topCenterTelemetry {
+            width: 540px;
+            opacity: 0.88;
+        }
+
+        .telemetry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--hud-cyan);
+            box-shadow: 0 2px 6px -2px var(--hud-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .telemetry-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .telemetry-bars-mini {
+            display: inline-flex;
+            gap: 2px;
+            height: 10px;
+            align-items: flex-end;
+        }
+
+        .telemetry-bars-mini span {
+            width: 2px;
+            background: var(--hud-cyan);
+            display: inline-block;
+        }
+
+        .telemetry-center-id {
+            letter-spacing: 1.5px;
+            color: var(--hud-cyan-bright);
+        }
+
+        .telemetry-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mini-barcode {
+            display: flex;
+            align-items: center;
+            height: 11px;
+            gap: 1px;
+        }
+
+        .mini-barcode span {
+            height: 100%;
+            background: var(--hud-cyan);
+            display: inline-block;
+        }
+
+        .telemetry-sub {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 4px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 2px;
+        }
+
+        /* =========================================================
+           3. BAS GAUCHE : CARTE STREAMEUR DOUBLE PAGE (P1 / P2)
+           ========================================================= */
+        #bottomLeftModule {
+            width: 325px;
+        }
+
+        .bl-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding-right: 12px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1.2px;
+            opacity: 0.9;
+        }
+
+        .bl-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bl-header-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            width: 12px;
+        }
+
+        .bl-header-lines span {
+            height: 2px;
+            background: var(--hud-cyan);
+            width: 100%;
+        }
+
+        .page-pills {
+            display: flex;
+            gap: 4px;
+            font-size: 9px;
+        }
+
+        .page-pill {
+            padding: 1px 5px;
+            border: 1px solid var(--hud-cyan-dim);
+            opacity: 0.45;
+            transition: all 0.25s ease;
+        }
+
+        .page-pill.active {
+            opacity: 1;
+            background: rgba(77, 238, 234, 0.22);
+            border-color: var(--hud-cyan);
+            color: var(--hud-cyan-bright);
+            box-shadow: 0 0 6px rgba(77, 238, 234, 0.4);
+        }
+
+        .bl-body-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .bl-side-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding-top: 4px;
+        }
+
+        .wireframe-globe {
+            width: 22px;
+            height: 22px;
+            animation: pulse-opacity 4s infinite ease-in-out;
+        }
+
+        .bl-card {
+            position: relative;
+            flex: 1;
+            height: 158px;
+            background: var(--hud-cyan-bg);
+            border: 1px solid var(--hud-cyan);
+            padding: 11px 14px 10px 14px;
+            clip-path: polygon(
+                    0 0,
+                    calc(100% - 18px) 0,
+                    100% 18px,
+                    100% 100%,
+                    0 100%
+            );
+            box-shadow: inset 0 0 18px rgba(77, 238, 234, 0.18);
+            overflow: hidden;
+        }
+
+        .bl-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 26px;
+            height: 26px;
+            border-bottom: 2px solid var(--hud-cyan);
+            transform: rotate(45deg) translate(6px, -13px);
+        }
+
+        .bl-right-accent {
+            width: 5px;
+            height: 115px;
+            background: var(--hud-cyan-bright);
+            box-shadow: 0 0 10px var(--hud-cyan);
+            align-self: center;
+            clip-path: polygon(0 0, 100% 8%, 100% 92%, 0 100%);
+        }
+
+        .card-page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-page.active {
+            display: flex;
+            animation: page-glitch-in 0.28s ease-out;
+        }
+
+        @keyframes page-glitch-in {
+            0% {
+                opacity: 0.2;
+                transform: translateX(-6px) skewX(8deg);
+                filter: drop-shadow(4px 0 var(--hud-red));
+            }
+            50% {
+                opacity: 0.85;
+                transform: translateX(3px) skewX(-4deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) skewX(0);
+                filter: none;
+            }
+        }
+
+        /* Contenu Page 1 : Infos Streameur */
+        .bl-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .micro-data-block {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            line-height: 1.35;
+            opacity: 0.92;
+            text-transform: uppercase;
+        }
+
+        .streamer-highlight {
+            color: var(--hud-cyan-bright);
+            font-weight: bold;
+            font-size: 10.5px;
+        }
+
+        .card-arasaka-mini {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .card-arasaka-mini svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .bl-card-mid {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8.5px;
+            line-height: 1.35;
+            opacity: 0.85;
+            border-left: 2px solid var(--hud-cyan);
+            padding-left: 6px;
+        }
+
+        .large-barcode-container {
+            width: 85%;
+            height: 26px;
+            display: flex;
+            align-items: stretch;
+            gap: 1.5px;
+            padding: 3px;
+            border: 1px solid var(--hud-cyan-dim);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .large-barcode-container div {
+            background-color: var(--hud-cyan);
+            box-shadow: 0 0 4px var(--hud-cyan);
+        }
+
+        /* Contenu Page 2 : Graphique Multi-Courbes (Vraies Valeurs) */
+        .graph-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8.5px;
+            padding-right: 10px;
+            border-bottom: 1px solid var(--hud-cyan-dim);
+            padding-bottom: 3px;
+        }
+
+        .graph-legend {
+            display: flex;
+            gap: 8px;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .legend-dot {
+            width: 6px;
+            height: 6px;
+            display: inline-block;
+        }
+
+        .graph-canvas-wrap {
+            position: relative;
+            flex: 1;
+            margin: 5px 0;
+            border: 1px solid rgba(77, 238, 234, 0.3);
+            background:
+                    linear-gradient(rgba(77, 238, 234, 0.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(77, 238, 234, 0.08) 1px, transparent 1px),
+                    rgba(2, 12, 16, 0.55);
+            background-size: 16px 16px;
+            overflow: hidden;
+        }
+
+        #telemetryGraphCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .graph-empty-notice {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 9px;
+            opacity: 0.65;
+            letter-spacing: 1px;
+        }
+
+        .graph-page-footer {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8px;
+            opacity: 0.9;
+            min-height: 10px;
+        }
+
+        .bl-footer {
+            margin-top: 5px;
+            padding-left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 8.5px;
+            letter-spacing: 0.8px;
+            opacity: 0.85;
+        }
+
+        .bl-footer-box {
+            border: 1px solid var(--hud-cyan);
+            padding: 1px 4px;
+            font-size: 7.5px;
+        }
+
+        /* =========================================================
+           4. BAS DROITE : BANDEAU BOURSIER DÉFILANT (OBS + STREAM)
+           ========================================================= */
+        #bottomRightTicker {
+            width: 455px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .br-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 18px 4px 6px;
+            border-bottom: 1px solid var(--hud-cyan-dim);
+        }
+
+        .br-audio-glyph {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .glyph-circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid var(--hud-cyan);
+        }
+
+        .glyph-circle-fill {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--hud-cyan);
+        }
+
+        .glyph-bars {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 14px;
+            margin-left: 2px;
+        }
+
+        .glyph-bars span {
+            width: 2px;
+            background: var(--hud-cyan);
+            animation: eq-bounce 1.2s infinite ease-in-out;
+        }
+
+        .glyph-bars span:nth-child(1) { height: 6px; animation-delay: 0.1s; }
+        .glyph-bars span:nth-child(2) { height: 12px; animation-delay: 0.3s; }
+        .glyph-bars span:nth-child(3) { height: 8px; animation-delay: 0.2s; }
+        .glyph-bars span:nth-child(4) { height: 14px; animation-delay: 0.4s; }
+
+        .br-connection-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+        }
+
+        .br-main-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, transparent 0%, var(--hud-cyan-bg) 10%, var(--hud-cyan-bg) 92%, transparent 100%);
+            border-bottom: 1px solid var(--hud-cyan);
+            padding: 6px 8px;
+            gap: 8px;
+            min-height: 39px;
+        }
+
+        .ticker-bracket {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 18px;
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        .ticker-viewport {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+        }
+
+        .ticker-track {
+            display: flex;
+            width: max-content;
+            animation: ticker-scroll 20s linear infinite;
+        }
+
+        .ticker-group {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding-right: 28px;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .stock-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 21px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        .stock-name {
+            color: var(--hud-cyan-bright);
+        }
+
+        .stock-val {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 20px;
+        }
+
+        .stock-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stock-up {
+            color: var(--hud-green);
+            text-shadow: 0 0 8px rgba(38, 255, 104, 0.7);
+        }
+
+        .stock-down {
+            color: var(--hud-red);
+            text-shadow: 0 0 8px rgba(255, 51, 75, 0.7);
+        }
+
+        .br-right-telemetry {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 7px;
+            line-height: 1;
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        .br-mini-graph {
+            width: 16px;
+            height: 14px;
+            border: 1px solid var(--hud-cyan);
+            display: flex;
+            align-items: flex-end;
+            gap: 1px;
+            padding: 1px;
+        }
+
+        .br-mini-graph span {
+            flex: 1;
+            background: var(--hud-cyan);
+        }
+
+        /* =========================================================
+           PANNEAU DE CONFIGURATION (MODE ÉDITION : TOUCHE 'E')
+           ========================================================= */
+        #configPanel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 350px;
+            background: rgba(6, 20, 26, 0.94);
+            border: 1px solid var(--hud-cyan);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+            padding: 16px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            z-index: 9999;
+            display: none;
+        }
+
+        body.edit-mode #configPanel {
+            display: block;
+        }
+
+        .cfg-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--hud-cyan);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .cfg-row {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cfg-row input[type="text"], .cfg-row input[type="number"] {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--hud-cyan-dim);
+            color: var(--hud-cyan-bright);
+            padding: 5px 8px;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .cfg-widget-box {
+            border: 1px solid var(--hud-cyan-dim);
+            padding: 8px;
+            margin-bottom: 8px;
+            background: rgba(77, 238, 234, 0.04);
+        }
+
+        .cfg-widget-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .cfg-sliders {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            font-size: 10px;
+        }
+
+        .cfg-btn {
+            width: 100%;
+            padding: 8px;
+            background: var(--hud-cyan);
+            color: #041217;
+            border: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .cfg-btn-secondary {
+            background: transparent;
+            color: var(--hud-cyan-bright);
+            border: 1px solid var(--hud-cyan);
+        }
+
+        .cfg-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        @keyframes pulse-opacity {
+            0%, 100% { opacity: 0.65; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes eq-bounce {
+            0%, 100% { transform: scaleY(0.45); }
+            50% { transform: scaleY(1); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Logo Arasaka officiel (Kamon 3 feuilles pleines + tige centrale) -->
+<svg style="display: none;">
+    <symbol id="arasaka-kamon" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" stroke-width="7.5"/>
+        <path d="M 50 25 L 50 86" stroke="currentColor" stroke-width="8.5" stroke-linecap="butt"/>
+        <path d="M 50 71 L 28 49" stroke="currentColor" stroke-width="8.5" stroke-linecap="round"/>
+        <path d="M 50 71 L 72 49" stroke="currentColor" stroke-width="8.5" stroke-linecap="round"/>
+        <circle cx="50" cy="25" r="12.5" fill="currentColor"/>
+        <circle cx="28" cy="49" r="12.5" fill="currentColor"/>
+        <circle cx="72" cy="49" r="12.5" fill="currentColor"/>
+    </symbol>
+</svg>
+
+<div class="hud-container" id="hudRoot">
+
+    <!-- =====================================================
+         1. HAUT GAUCHE : LOGO ARASAKA
+         ===================================================== -->
+    <div class="hud-widget" id="topLeftBrand" data-widget="topLeftBrand">
+        <svg class="arasaka-symbol">
+            <use href="#arasaka-kamon"></use>
+        </svg>
+        <span class="arasaka-wordmark">arasaka</span>
+    </div>
+
+    <!-- =====================================================
+         2. HAUT CENTRE : STATUT SYSTÈME KIROSHI
+         ===================================================== -->
+    <div class="hud-widget" id="topCenterTelemetry" data-widget="topCenterTelemetry">
+        <div class="telemetry-header">
+            <div class="telemetry-left">
+                <div class="telemetry-bars-mini">
+                    <span style="height: 10px;"></span>
+                    <span style="height: 6px;"></span>
+                    <span style="height: 8px;"></span>
+                </div>
+                <span>SYSTEM STATUS:</span>
+            </div>
+            <div class="telemetry-center-id" id="ncSerial">NC 4584 0252 6584 0415</div>
+            <div class="telemetry-right">
+                <div class="mini-barcode" id="topMiniBarcode"></div>
+                <span>KIROSHI</span>
+            </div>
+        </div>
+        <div class="telemetry-sub">
+                <span>
+                    <span id="systemStatusState">STANDBY</span>
+                    <span id="topCategoryWrap" class="hidden"> // <span id="streamCategory"></span></span>
+                </span>
+            <span style="font-size: 11px; opacity: 0.75; font-family: 'Share Tech Mono', monospace;" id="hudClock"></span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         3. BAS GAUCHE : CARTE STREAMEUR DOUBLE PAGE (P1 / P2)
+         ===================================================== -->
+    <div class="hud-widget" id="bottomLeftModule" data-widget="bottomLeftModule">
+        <div class="bl-header">
+            <div class="bl-header-left">
+                <div class="bl-header-lines">
+                    <span></span><span></span><span></span>
+                </div>
+                <span id="leftConnectionId">CONNECTION 555.441.26</span>
+            </div>
+            <div class="page-pills">
+                <span class="page-pill active" id="pillPage1">01 // BIO</span>
+                <span class="page-pill" id="pillPage2">02 // NET</span>
+            </div>
+        </div>
+
+        <div class="bl-body-wrapper">
+            <div class="bl-side-icons">
+                <div class="bl-header-lines" style="width: 14px; opacity: 0.6;">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <svg class="wireframe-globe" viewBox="0 0 50 50" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="25" cy="25" r="21"/>
+                    <ellipse cx="25" cy="25" rx="11" ry="21"/>
+                    <ellipse cx="25" cy="25" rx="21" ry="9"/>
+                    <line x1="4" y1="25" x2="46" y2="25"/>
+                    <line x1="25" y1="4" x2="25" y2="46"/>
+                </svg>
+            </div>
+
+            <!-- CARTE PRINCIPALE (PAGE 1 & PAGE 2) -->
+            <div class="bl-card scanlines">
+
+                <!-- PAGE 1 : INFOS STREAMEUR & SESSION (AFFICHE UNIQUEMENT CE QUI EST DISPONIBLE) -->
+                <div class="card-page active" id="cardPage1">
+                    <div class="bl-card-top">
+                        <div class="micro-data-block">
+                            <div id="rowStreamerName" class="hidden">OPERATIVE // <span class="streamer-highlight" id="streamerNameDisplay"></span></div>
+                            <div id="rowUptime" class="hidden">UPTIME: <span id="uptimeDisplay"></span></div>
+                            <div id="rowActivity" class="hidden">ACTIVITY: <span id="cardGameDisplay"></span></div>
+                            <div id="rowObsScene" class="hidden">OBS_SCENE: <span id="obsSceneDisplay"></span></div>
+                        </div>
+                        <div class="card-arasaka-mini">
+                            <svg><use href="#arasaka-kamon"></use></svg>
+                            <span>arasaka</span>
+                        </div>
+                    </div>
+
+                    <div class="bl-card-mid">
+                        <div>OBS_LINK: <span id="obsStatusText">DISCONNECTED</span><span id="obsFpsWrap" class="hidden"> // <span id="obsFpsMini"></span></span></div>
+                        <div id="rowClearance">CLEARANCE: <span id="clearanceDisplay">LEVEL_04_EXEC</span></div>
+                    </div>
+
+                    <div class="large-barcode-container" id="mainBarcode"></div>
+                </div>
+
+                <!-- PAGE 2 : VRAIES COURBES TEMPS RÉEL (CPU / VWR / FRM ms) -->
+                <div class="card-page" id="cardPage2">
+                    <div class="graph-page-header">
+                        <span>REALTIME_PLOT</span>
+                        <div class="graph-legend">
+                                <span class="legend-item hidden" id="legendCpu">
+                                    <i class="legend-dot" style="background: #4deeea; box-shadow: 0 0 4px #4deeea;"></i>CPU
+                                </span>
+                            <span class="legend-item hidden" id="legendVwr">
+                                    <i class="legend-dot" style="background: #26ff68; box-shadow: 0 0 4px #26ff68;"></i>VWR
+                                </span>
+                            <span class="legend-item hidden" id="legendFrm">
+                                    <i class="legend-dot" style="background: #ff334b; box-shadow: 0 0 4px #ff334b;"></i>FRM
+                                </span>
+                        </div>
+                    </div>
+
+                    <div class="graph-canvas-wrap">
+                        <canvas id="telemetryGraphCanvas" width="240" height="86"></canvas>
+                        <div class="graph-empty-notice" id="graphEmptyNotice">NO ACTIVE TELEMETRY</div>
+                    </div>
+
+                    <div class="graph-page-footer">
+                        <span id="footerStatCpuWrap" class="hidden" style="color:#4deeea;">CPU: <strong id="graphStatCpu"></strong></span>
+                        <span id="footerStatVwrWrap" class="hidden" style="color:#26ff68;">VWR: <strong id="graphStatVwr"></strong></span>
+                        <span id="footerStatFrmWrap" class="hidden" style="color:#ff334b;">FRM: <strong id="graphStatFrm"></strong></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bl-right-accent"></div>
+        </div>
+
+        <div class="bl-footer hidden" id="blFooterRow">
+            <span class="bl-footer-box">Z</span>
+            <span id="streamTitleFooter"></span>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         4. BAS DROITE : BANDEAU BOURSIER DÉFILANT (OBS + STREAM)
+         ===================================================== -->
+    <div class="hud-widget" id="bottomRightTicker" data-widget="bottomRightTicker">
+        <div class="br-top-row">
+            <div class="br-audio-glyph">
+                <div class="glyph-circle"></div>
+                <div class="glyph-circle-fill"></div>
+                <div class="glyph-bars">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+            <div class="br-connection-text" id="rightConnectionId">CONNECTION 555.441.26</div>
+        </div>
+
+        <div class="br-main-row scanlines">
+            <span class="ticker-bracket">]</span>
+
+            <div class="ticker-viewport">
+                <div class="ticker-track" id="tickerTrack">
+                    <div class="ticker-group" id="tickerGroupA"></div>
+                    <div class="ticker-group" id="tickerGroupB"></div>
+                </div>
+            </div>
+
+            <div class="br-right-telemetry">
+                <span id="telBitrate" class="hidden"></span>
+                <span id="telFps" class="hidden"></span>
+                <span id="telRam" class="hidden"></span>
+                <div class="br-mini-graph">
+                    <span style="height: 45%;"></span>
+                    <span style="height: 85%;"></span>
+                    <span style="height: 65%;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- =========================================================
+     PANNEAU D'ÉDITION INTERACTIF (Touche 'E' ou ?edit=true)
+     ========================================================= -->
+<div id="configPanel">
+    <div class="cfg-title">
+        <span>ARASAKA HUD CONFIG</span>
+        <span style="font-size:10px; opacity:0.7;">[Touche E]</span>
+    </div>
+
+    <div class="cfg-row">
+        <label>Pseudo du Streameur (Twitch)</label>
+        <input type="text" id="cfgStreamerName" placeholder="Ex: ocelus">
+    </div>
+
+    <div class="cfg-row">
+        <label>Alternance Carte Page 1 / Page 2 (secondes)</label>
+        <input type="number" id="cfgFlipInterval" min="3" max="120" value="10">
+    </div>
+
+    <button class="cfg-btn cfg-btn-secondary" id="forceFlipBtn" style="margin-bottom: 10px;">
+        BASCULER PAGE 1 / PAGE 2
+    </button>
+
+    <div id="widgetControlsContainer"></div>
+
+    <button class="cfg-btn" id="saveConfigBtn">SAUVEGARDER LE LAYOUT</button>
+</div>
+
+<script>
+    let appConfig = {
+        streamerName: "",
+        clearanceLevel: "LEVEL_04_EXEC",
+        connectionId: "555.441.26",
+        cardFlipIntervalSec: 10,
+        widgets: {
+            topLeftBrand: { enabled: true, x: 44, y: 24, scale: 1, tilt: 8 },
+            topCenterTelemetry: { enabled: true, x: 690, y: 38, scale: 1, tilt: 0 },
+            bottomLeftModule: { enabled: true, x: 44, y: 825, scale: 1, tilt: 12 },
+            bottomRightTicker: { enabled: true, x: 1410, y: 940, scale: 1, tilt: -12 }
+        }
+    };
+
+    // Aucune valeur inventée par défaut : tout est vide/null jusqu'à réception du backend
+    let currentTelemetry = {
+        obsConnected: false,
+        streamer: {
+            name: null,
+            category: null,
+            scene: null,
+            title: null,
+            isLive: false,
+            uptimeSeconds: null
+        },
+        metrics: {}
+    };
+
+    function setVisible(id, isVisible) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden', !isVisible);
+    }
+
+    // ====================================================================
+    // 1. GESTION DE L'ALTERNANCE PAGE 1 / PAGE 2 DE LA CARTE STREAMEUR
+    // ====================================================================
+    let activeCardPage = 1;
+    let flipTimer = null;
+
+    function setCardPage(pageNum) {
+        activeCardPage = pageNum;
+        document.getElementById('cardPage1').classList.toggle('active', pageNum === 1);
+        document.getElementById('cardPage2').classList.toggle('active', pageNum === 2);
+        document.getElementById('pillPage1').classList.toggle('active', pageNum === 1);
+        document.getElementById('pillPage2').classList.toggle('active', pageNum === 2);
+    }
+
+    function toggleCardPage() {
+        setCardPage(activeCardPage === 1 ? 2 : 1);
+    }
+
+    function resetFlipTimer() {
+        if (flipTimer) clearInterval(flipTimer);
+        const intervalMs = Math.max(3, Number(appConfig.cardFlipIntervalSec) || 10) * 1000;
+        flipTimer = setInterval(toggleCardPage, intervalMs);
+    }
+
+    document.getElementById('forceFlipBtn').addEventListener('click', () => {
+        toggleCardPage();
+        resetFlipTimer();
+    });
+
+    // ====================================================================
+    // 2. VRAIES COURBES (CPU %, VIEWERS, FRAME RENDER TIME ms)
+    //    SANS AUCUNE VALEUR PRÉ-REMPLIE OU INVENTÉE
+    // ====================================================================
+    const MAX_GRAPH_POINTS = 28;
+    const graphHistory = {
+        cpu: [],
+        vwr: [],
+        frm: []
+    };
+
+    function pushRealValue(series, realNumber) {
+        const val = Number(realNumber);
+        if (!Number.isFinite(val)) return;
+        series.push(val);
+        if (series.length > MAX_GRAPH_POINTS) series.shift();
+    }
+
+    function normalizeSeries(series, minSpread) {
+        let min = Math.min(...series);
+        let max = Math.max(...series);
+        let span = max - min;
+
+        if (span < minSpread) {
+            const mid = (min + max) / 2;
+            min = mid - minSpread / 2;
+            max = mid + minSpread / 2;
+            span = minSpread;
+        }
+        return series.map(v => (v - min) / span);
+    }
+
+    function drawMultiCurveGraph() {
+        const canvas = document.getElementById('telemetryGraphCanvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width;
+        const h = canvas.height;
+
+        ctx.clearRect(0, 0, w, h);
+
+        const m = currentTelemetry.metrics || {};
+        const activeCurves = [];
+
+        if (m.FRM !== undefined && graphHistory.frm.length >= 2) {
+            activeCurves.push({
+                normData: normalizeSeries(graphHistory.frm, 0.4),
+                color: '#ff334b',
+                fill: 'rgba(255, 51, 75, 0.08)'
+            });
+        }
+        if (m.VWR !== undefined && graphHistory.vwr.length >= 2) {
+            activeCurves.push({
+                normData: normalizeSeries(graphHistory.vwr, 6),
+                color: '#26ff68',
+                fill: 'rgba(38, 255, 104, 0.08)'
+            });
+        }
+        if (m.CPU !== undefined && graphHistory.cpu.length >= 2) {
+            activeCurves.push({
+                normData: normalizeSeries(graphHistory.cpu, 1.5),
+                color: '#4deeea',
+                fill: 'rgba(77, 238, 234, 0.14)'
+            });
+        }
+
+        setVisible('graphEmptyNotice', activeCurves.length === 0);
+        if (activeCurves.length === 0) return;
+
+        // Ligne médiane de référence Kiroshi
+        ctx.strokeStyle = 'rgba(77, 238, 234, 0.22)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(0, h / 2);
+        ctx.lineTo(w, h / 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const padTop = 10;
+        const padBottom = 10;
+        const usableHeight = h - padTop - padBottom;
+
+        activeCurves.forEach(curve => {
+            const count = curve.normData.length;
+            const pts = curve.normData.map((normVal, idx) => ({
+                x: (idx / (count - 1)) * (w - 6) + 2,
+                y: padTop + (1 - normVal) * usableHeight
+            }));
+
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 0; i < pts.length - 1; i++) {
+                const xc = (pts[i].x + pts[i + 1].x) / 2;
+                const yc = (pts[i].y + pts[i + 1].y) / 2;
+                ctx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
+            }
+            const last = pts[pts.length - 1];
+            ctx.lineTo(last.x, last.y);
+
+            ctx.strokeStyle = curve.color;
+            ctx.lineWidth = 1.8;
+            ctx.shadowColor = curve.color;
+            ctx.shadowBlur = 6;
+            ctx.stroke();
+
+            ctx.lineTo(last.x, h);
+            ctx.lineTo(pts[0].x, h);
+            ctx.closePath();
+            ctx.fillStyle = curve.fill;
+            ctx.shadowBlur = 0;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(last.x, last.y, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = curve.color;
+            ctx.shadowColor = curve.color;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        });
+    }
+
+    // ====================================================================
+    // 3. CODES-BARRES, LAYOUT ET MISE À JOUR DU HUD (MASQUAGE SI ABSENT)
+    // ====================================================================
+    function generateBarcodes() {
+        const mainBarcode = document.getElementById('mainBarcode');
+        const topMiniBarcode = document.getElementById('topMiniBarcode');
+
+        mainBarcode.innerHTML = '';
+        [1, 2, 3, 1, 4, 1, 2, 1, 3, 2, 1, 1, 3, 1, 2, 4, 1, 2, 1, 2, 3, 1, 2, 1, 3, 1, 2].forEach((w, idx) => {
+            const bar = document.createElement('div');
+            bar.style.flex = `${w}`;
+            bar.style.opacity = (idx % 5 === 0) ? '0.55' : '0.95';
+            mainBarcode.appendChild(bar);
+        });
+
+        topMiniBarcode.innerHTML = '';
+        [2, 1, 3, 1, 2, 1, 2, 3, 1, 2, 1, 2].forEach(w => {
+            const bar = document.createElement('span');
+            bar.style.width = `${w}px`;
+            topMiniBarcode.appendChild(bar);
+        });
+    }
+
+    function applyLayoutConfig() {
+        document.getElementById('clearanceDisplay').textContent = appConfig.clearanceLevel || 'LEVEL_04_EXEC';
+        document.getElementById('leftConnectionId').textContent = `CONNECTION ${appConfig.connectionId || '555.441.26'}`;
+        document.getElementById('rightConnectionId').textContent = `CONNECTION ${appConfig.connectionId || '555.441.26'}`;
+
+        Object.entries(appConfig.widgets).forEach(([id, w]) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.style.display = w.enabled ? '' : 'none';
+            el.style.left = `${w.x}px`;
+            el.style.top = `${w.y}px`;
+            const skew = w.tilt ? (w.tilt > 0 ? -1.5 : 1.5) : 0;
+            el.style.transform = `perspective(700px) scale(${w.scale || 1}) rotateY(${w.tilt || 0}deg) skewY(${skew}deg)`;
+        });
+    }
+
+    function formatUptime(totalSeconds) {
+        const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const secs = String(totalSeconds % 60).padStart(2, '0');
+        return `${hrs}H ${mins}M ${secs}S`;
+    }
+
+    function renderTicker() {
+        const metricsList = Object.values(currentTelemetry.metrics || {});
+        const groupA = document.getElementById('tickerGroupA');
+        const groupB = document.getElementById('tickerGroupB');
+
+        if (metricsList.length === 0) {
+            const emptyHtml = `<div class="stock-item" style="opacity:0.6; font-size:15px;">AWAITING TELEMETRY LINK...</div>`;
+            groupA.innerHTML = emptyHtml;
+            groupB.innerHTML = emptyHtml;
+            return;
+        }
+
+        const htmlContent = metricsList.map(m => {
+            let changeHtml = '';
+            if (m.diff !== null && m.diff !== undefined) {
+                const arrow = m.up ? '▲' : '▼';
+                const colorClass = m.up ? 'stock-up' : 'stock-down';
+                changeHtml = `<span class="stock-change ${colorClass}">${arrow} ${m.diff}</span>`;
+            }
+            return `
+                    <div class="stock-item">
+                        <span class="stock-name">${m.label}</span>
+                        <span class="stock-val">${m.value}${m.unit || ''}</span>
+                        ${changeHtml}
+                    </div>
+                `;
+        }).join('');
+
+        groupA.innerHTML = htmlContent;
+        groupB.innerHTML = htmlContent;
+    }
+
+    function updateHUDFromTelemetry() {
+        const s = currentTelemetry.streamer || {};
+        const m = currentTelemetry.metrics || {};
+
+        // Statut global en haut au centre
+        const isOnline = Boolean(currentTelemetry.obsConnected || s.isLive);
+        document.getElementById('systemStatusState').textContent = isOnline ? 'OPTIMAL' : 'STANDBY';
+
+        setVisible('topCategoryWrap', Boolean(s.category));
+        if (s.category) {
+            document.getElementById('streamCategory').textContent = s.category.toUpperCase();
+        }
+
+        // Page 1 : Lignes affichées uniquement si l'info existe vraiment
+        const effectiveName = s.name || appConfig.streamerName;
+        setVisible('rowStreamerName', Boolean(effectiveName));
+        if (effectiveName) {
+            document.getElementById('streamerNameDisplay').textContent = effectiveName.toUpperCase();
+        }
+
+        const hasUptime = typeof s.uptimeSeconds === 'number' && s.uptimeSeconds >= 0;
+        setVisible('rowUptime', hasUptime);
+        if (hasUptime) {
+            document.getElementById('uptimeDisplay').textContent = formatUptime(s.uptimeSeconds);
+        }
+
+        setVisible('rowActivity', Boolean(s.category));
+        if (s.category) {
+            document.getElementById('cardGameDisplay').textContent = s.category.toUpperCase().slice(0, 18);
+        }
+
+        setVisible('rowObsScene', Boolean(s.scene));
+        if (s.scene) {
+            document.getElementById('obsSceneDisplay').textContent = s.scene.toUpperCase().slice(0, 18);
+        }
+
+        document.getElementById('obsStatusText').textContent = currentTelemetry.obsConnected ? 'ACTIVE' : 'OFFLINE';
+
+        const hasFps = m.FPS !== undefined;
+        setVisible('obsFpsWrap', hasFps);
+        setVisible('telFps', hasFps);
+        if (hasFps) {
+            document.getElementById('obsFpsMini').textContent = `${m.FPS.value} FPS`;
+            document.getElementById('telFps').textContent = `${Math.round(m.FPS.value)}FPS`;
+        }
+
+        // Titre du stream en bas de carte
+        setVisible('blFooterRow', Boolean(s.title));
+        if (s.title) {
+            document.getElementById('streamTitleFooter').textContent = s.title.toUpperCase().slice(0, 42);
+        }
+
+        // Page 2 : Courbes et statistiques réelles (CPU, VWR, FRM)
+        const hasCpu = m.CPU !== undefined;
+        setVisible('legendCpu', hasCpu);
+        setVisible('footerStatCpuWrap', hasCpu);
+        if (hasCpu) {
+            document.getElementById('graphStatCpu').textContent = `${m.CPU.value}%`;
+            pushRealValue(graphHistory.cpu, m.CPU.value);
+        } else {
+            graphHistory.cpu = [];
+        }
+
+        const hasVwr = m.VWR !== undefined;
+        setVisible('legendVwr', hasVwr);
+        setVisible('footerStatVwrWrap', hasVwr);
+        if (hasVwr) {
+            document.getElementById('graphStatVwr').textContent = m.VWR.value;
+            pushRealValue(graphHistory.vwr, m.VWR.value);
+        } else {
+            graphHistory.vwr = [];
+        }
+
+        const hasFrm = m.FRM !== undefined;
+        setVisible('legendFrm', hasFrm);
+        setVisible('footerStatFrmWrap', hasFrm);
+        if (hasFrm) {
+            document.getElementById('graphStatFrm').textContent = `${m.FRM.value}ms`;
+            pushRealValue(graphHistory.frm, m.FRM.value);
+        } else {
+            graphHistory.frm = [];
+        }
+
+        // Colonne miniature à droite du ticker (Bitrate / RAM réels uniquement)
+        const hasBit = m.BIT !== undefined;
+        setVisible('telBitrate', hasBit);
+        if (hasBit) {
+            document.getElementById('telBitrate').textContent = `${m.BIT.value}K`;
+        }
+
+        const hasRam = m.RAM !== undefined;
+        setVisible('telRam', hasRam);
+        if (hasRam) {
+            document.getElementById('telRam').textContent = `${m.RAM.value}M`;
+        }
+
+        drawMultiCurveGraph();
+        renderTicker();
+    }
+
+    // ====================================================================
+    // 4. CONNEXION WEBSOCKET NODE.JS (AUCUN FALLBACK DE FAUSSES DONNÉES)
+    // ====================================================================
+    function connectBackend() {
+        if (location.protocol === 'file:') {
+            updateHUDFromTelemetry();
+            return;
+        }
+
+        const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const ws = new WebSocket(`${wsProtocol}//${location.host}`);
+
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            if (msg.type === 'INIT') {
+                appConfig = { ...appConfig, ...msg.config };
+                currentTelemetry = msg.telemetry;
+                applyLayoutConfig();
+                resetFlipTimer();
+                updateHUDFromTelemetry();
+                buildConfigPanelUI();
+            } else if (msg.type === 'TELEMETRY_UPDATE') {
+                currentTelemetry = msg.data;
+                updateHUDFromTelemetry();
+            } else if (msg.type === 'CONFIG_UPDATE') {
+                appConfig = { ...appConfig, ...msg.data };
+                applyLayoutConfig();
+                resetFlipTimer();
+                updateHUDFromTelemetry();
+            }
+        };
+
+        ws.onclose = () => {
+            // Si le serveur Node est coupé, on vide les métriques pour ne rien afficher de périmé
+            currentTelemetry = { obsConnected: false, streamer: {}, metrics: {} };
+            updateHUDFromTelemetry();
+            setTimeout(connectBackend, 4000);
+        };
+    }
+
+    // ====================================================================
+    // 5. ÉDITEUR DE LAYOUT DRAG & DROP
+    // ====================================================================
+    let activeDragWidget = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    document.querySelectorAll('.hud-widget').forEach(widget => {
+        widget.addEventListener('mousedown', (e) => {
+            if (!document.body.classList.contains('edit-mode')) return;
+            activeDragWidget = widget;
+            const id = widget.dataset.widget;
+            dragOffsetX = e.clientX - appConfig.widgets[id].x;
+            dragOffsetY = e.clientY - appConfig.widgets[id].y;
+        });
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!activeDragWidget) return;
+        const id = activeDragWidget.dataset.widget;
+        appConfig.widgets[id].x = Math.round(e.clientX - dragOffsetX);
+        appConfig.widgets[id].y = Math.round(e.clientY - dragOffsetY);
+        applyLayoutConfig();
+    });
+
+    window.addEventListener('mouseup', () => {
+        activeDragWidget = null;
+    });
+
+    function buildConfigPanelUI() {
+        document.getElementById('cfgStreamerName').value = appConfig.streamerName || '';
+        document.getElementById('cfgFlipInterval').value = appConfig.cardFlipIntervalSec || 10;
+
+        const container = document.getElementById('widgetControlsContainer');
+        container.innerHTML = '';
+
+        const labels = {
+            topLeftBrand: "Logo Arasaka (Haut G)",
+            topCenterTelemetry: "Barre Kiroshi (Haut C)",
+            bottomLeftModule: "Carte Streameur P1/P2 (Bas G)",
+            bottomRightTicker: "Ticker Bourse OBS (Bas D)"
+        };
+
+        Object.entries(appConfig.widgets).forEach(([id, w]) => {
+            const box = document.createElement('div');
+            box.className = 'cfg-widget-box';
+            box.innerHTML = `
+                    <div class="cfg-widget-header">
+                        <span>${labels[id] || id}</span>
+                        <input type="checkbox" data-id="${id}" class="chk-enable" ${w.enabled ? 'checked' : ''}>
+                    </div>
+                    <div class="cfg-sliders">
+                        <label>Taille: <input type="number" step="0.05" min="0.5" max="2" data-id="${id}" class="inp-scale" value="${w.scale}"></label>
+                        <label>Angle 3D: <input type="number" step="1" min="-25" max="25" data-id="${id}" class="inp-tilt" value="${w.tilt}"></label>
+                    </div>
+                `;
+            container.appendChild(box);
+        });
+
+        container.querySelectorAll('.chk-enable').forEach(el => {
+            el.addEventListener('change', (e) => {
+                appConfig.widgets[e.target.dataset.id].enabled = e.target.checked;
+                applyLayoutConfig();
+            });
+        });
+
+        container.querySelectorAll('.inp-scale').forEach(el => {
+            el.addEventListener('input', (e) => {
+                appConfig.widgets[e.target.dataset.id].scale = parseFloat(e.target.value) || 1;
+                applyLayoutConfig();
+            });
+        });
+
+        container.querySelectorAll('.inp-tilt').forEach(el => {
+            el.addEventListener('input', (e) => {
+                appConfig.widgets[e.target.dataset.id].tilt = parseFloat(e.target.value) || 0;
+                applyLayoutConfig();
+            });
+        });
+    }
+
+    document.getElementById('saveConfigBtn').addEventListener('click', async () => {
+        appConfig.streamerName = document.getElementById('cfgStreamerName').value.trim();
+        appConfig.cardFlipIntervalSec = parseInt(document.getElementById('cfgFlipInterval').value, 10) || 10;
+        applyLayoutConfig();
+        resetFlipTimer();
+
+        if (location.protocol !== 'file:') {
+            await fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(appConfig)
+            });
+        }
+        localStorage.setItem('arasaka_hud_config', JSON.stringify(appConfig));
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+        if (e.key.toLowerCase() === 'e') {
+            document.body.classList.toggle('edit-mode');
+            document.body.classList.toggle('debug-bg', document.body.classList.contains('edit-mode'));
+        } else if (e.key.toLowerCase() === 'b') {
+            document.body.classList.toggle('debug-bg');
+        }
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('hudClock').textContent = `2077.${m}.${d} // ${hh}:${mm}:${ss}`;
+    }
+
+    // Initialisation
+    if (new URLSearchParams(window.location.search).get('edit') === 'true') {
+        document.body.classList.add('edit-mode', 'debug-bg');
+    }
+    generateBarcodes();
+    applyLayoutConfig();
+    updateHUDFromTelemetry();
+    buildConfigPanelUI();
+    resetFlipTimer();
+    updateClock();
+    setInterval(updateClock, 1000);
+    connectBackend();
+</script>
+</body>
+</html>

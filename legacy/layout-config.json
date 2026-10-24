@@ -1,0 +1,35 @@
+{
+  "streamerName": "Djinks",
+  "clearanceLevel": "LEVEL_14_EXEC",
+  "connectionId": "555.441.26",
+  "widgets": {
+    "topLeftBrand": {
+      "enabled": true,
+      "x": 44,
+      "y": 24,
+      "scale": 1,
+      "tilt": 10
+    },
+    "topCenterTelemetry": {
+      "enabled": true,
+      "x": 700,
+      "y": 38,
+      "scale": 1,
+      "tilt": 0
+    },
+    "bottomLeftModule": {
+      "enabled": true,
+      "x": 41,
+      "y": 826,
+      "scale": 1.1,
+      "tilt": 12
+    },
+    "bottomRightTicker": {
+      "enabled": true,
+      "x": 1355,
+      "y": 914,
+      "scale": 1,
+      "tilt": -12
+    }
+  }
+}

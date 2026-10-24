@@ -1,0 +1,32 @@
+.toggle-field {
+    appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 38px;
+    height: 20px;
+    border: 1px solid var(--ui-border-strong);
+    background: #020608;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.toggle-field::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 12px;
+    height: 12px;
+    background: var(--ui-text-dim);
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.toggle-field:checked {
+    background: rgba(77, 238, 234, 0.2);
+    border-color: var(--ui-accent);
+}
+
+.toggle-field:checked::after {
+    transform: translateX(18px);
+    background: var(--ui-accent);
+}
