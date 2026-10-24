@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 
 const RETRY_DELAY_MS = 3000;
-// Nombre d'alertes reçues gardées en mémoire (seules les nouvelles sont affichées).
-const MAX_ALERTS = 20;
 const MAX_CHAT_MESSAGES = 100;
 
 function removeChatMessages(messages, { id, userId }) {
@@ -24,12 +22,15 @@ export const EMPTY_TELEMETRY = {
     history: {}
 };
 
+// File d'attente des alertes : alerte affichée, alertes en attente, types en pause.
+export const EMPTY_ALERT_QUEUE = { current: null, pending: [], paused: [] };
+
 // Connexion WebSocket au serveur HUD, avec reconnexion automatique.
 export function useBackend() {
     const [config, setConfig] = useState(null);
     const [telemetry, setTelemetry] = useState(EMPTY_TELEMETRY);
     const [twitchAuth, setTwitchAuth] = useState(null);
-    const [alerts, setAlerts] = useState([]);
+    const [alertQueue, setAlertQueue] = useState(EMPTY_ALERT_QUEUE);
     const [chat, setChat] = useState([]);
     const [runtime, setRuntime] = useState(null);
     const [connected, setConnected] = useState(false);
@@ -53,6 +54,7 @@ export function useBackend() {
                         setTwitchAuth(msg.twitchAuth);
                         // Messages d'avant la connexion : leur âge part de leur heure d'envoi.
                         setChat((msg.chat ?? []).map(m => ({ ...m, receivedAt: m.at })));
+                        setAlertQueue(msg.alertQueue ?? EMPTY_ALERT_QUEUE);
                         setRuntime(msg.runtime);
                         break;
                     case 'TELEMETRY_UPDATE':
@@ -73,8 +75,8 @@ export function useBackend() {
                     case 'CHAT_CLEAR':
                         setChat([]);
                         break;
-                    case 'ALERT':
-                        setAlerts(prev => [...prev, msg.data].slice(-MAX_ALERTS));
+                    case 'ALERT_QUEUE':
+                        setAlertQueue(msg.data);
                         break;
                     default:
                         break;
@@ -85,6 +87,7 @@ export function useBackend() {
                 // Serveur coupé : on vide les métriques pour ne rien afficher de périmé.
                 setConnected(false);
                 setTelemetry(EMPTY_TELEMETRY);
+                setAlertQueue(EMPTY_ALERT_QUEUE);
                 retryTimer = setTimeout(connect, RETRY_DELAY_MS);
             };
         };
@@ -97,5 +100,5 @@ export function useBackend() {
         };
     }, []);
 
-    return { config, telemetry, twitchAuth, alerts, chat, runtime, connected };
+    return { config, telemetry, twitchAuth, alertQueue, chat, runtime, connected };
 }

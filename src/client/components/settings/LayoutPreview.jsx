@@ -10,7 +10,7 @@ const HUD_HEIGHT = 1080;
  * sans défilement. Glisser un élément le déplace ; un clic le sélectionne pour afficher
  * ses réglages dans la colonne de gauche.
  */
-export default function LayoutPreview({ config, telemetry, alerts, chat, selectedWidget, onWidgetSelect, onWidgetChange }) {
+export default function LayoutPreview({ config, telemetry, currentAlert, chat, selectedWidget, onWidgetSelect, onWidgetChange }) {
     const [areaRef, area] = useElementSize();
     const scale = Math.min(area.width / HUD_WIDTH, area.height / HUD_HEIGHT) || 0;
 
@@ -27,7 +27,7 @@ export default function LayoutPreview({ config, telemetry, alerts, chat, selecte
                             <Overlay
                                 config={config}
                                 telemetry={telemetry}
-                                alerts={alerts}
+                                currentAlert={currentAlert}
                                 chat={chat}
                                 editable
                                 previewScale={scale}

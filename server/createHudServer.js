@@ -1,6 +1,5 @@
 import http from 'node:http';
 import path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { ConfigStore } from './config/ConfigStore.js';
 import { TelemetryState } from './telemetry/TelemetryState.js';
 import { ObsSource } from './telemetry/ObsSource.js';
@@ -9,6 +8,8 @@ import { FrameRateSource } from './telemetry/system/FrameRateSource.js';
 import { TwitchAuth } from './telemetry/twitch/TwitchAuth.js';
 import { TwitchSource } from './telemetry/twitch/TwitchSource.js';
 import { RecentEvents } from './telemetry/twitch/RecentEvents.js';
+import { AlertQueue } from './alerts/AlertQueue.js';
+import { SoundStore } from './alerts/SoundStore.js';
 import { ChatSource } from './chat/ChatSource.js';
 import { JsonCache } from './cache/JsonCache.js';
 import { MediaCache } from './cache/MediaCache.js';
@@ -35,6 +36,8 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     const obsSource = new ObsSource(telemetry);
     const systemSource = new SystemSource(telemetry);
     const frameRateSource = new FrameRateSource(telemetry);
+    const soundStore = new SoundStore(path.join(dataDir, 'sounds'));
+    const alertQueue = new AlertQueue(() => Math.max(2, configStore.get().alerts.durationSec) * 1000);
     const recentEvents = new RecentEvents(path.join(dataDir, 'recent-events.json'), telemetry);
     // Les vrais événements mettent à jour les widgets « dernier… », même si leur alerte est désactivée.
     const twitchSource = new TwitchSource(telemetry, twitchAuth, alert => {
@@ -58,7 +61,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     let broadcaster = null;
     let port = null;
 
-    // Envoie une alerte aux overlays, sauf si ce type est désactivé (`force` pour les tests).
+    // Met une alerte dans la file d'affichage, sauf si ce type est désactivé (`force` pour les tests).
     function emitAlert(alert, { force = false } = {}) {
         const { alerts } = configStore.get();
         const enabled = {
@@ -69,11 +72,11 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
             cheer: alerts.cheerEnabled && alert.bits >= alerts.cheerMinBits
         }[alert.kind];
         if (!enabled && !force) return;
-        broadcaster?.broadcast('ALERT', { id: randomUUID(), ...alert });
+        alertQueue.push(alert);
     }
 
     const httpServer = http.createServer(createApp({
-        clientDir, mediaCache, configStore, twitchAuth, frameRateSource, emitAlert, onRestartRequest
+        clientDir, mediaCache, configStore, twitchAuth, frameRateSource, alertQueue, soundStore, emitAlert, onRestartRequest
     }));
 
     // Lance tout de suite le téléchargement des images encore inconnues du message :
@@ -107,8 +110,10 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
             telemetry: telemetry.snapshot(),
             twitchAuth: twitchAuth.status(),
             chat: chatSource.recentMessages(),
+            alertQueue: alertQueue.state(),
             runtime: runtime()
         }));
+        alertQueue.on('change', state => broadcaster.broadcast('ALERT_QUEUE', state));
         telemetry.on('change', snapshot => broadcaster.broadcast('TELEMETRY_UPDATE', snapshot));
         twitchAuth.on('change', status => broadcaster.broadcast('TWITCH_AUTH_UPDATE', status));
         chatSource.on('message', message => {
@@ -129,6 +134,7 @@ export function createHudServer({ dataDir, clientDir, onRestartRequest = null })
     async function stop() {
         twitchSource.stop();
         chatSource.stop();
+        alertQueue.stop();
         systemSource.stop();
         frameRateSource.stop();
         twitchAuth.cancel();

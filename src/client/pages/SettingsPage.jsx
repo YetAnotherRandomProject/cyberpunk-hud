@@ -12,6 +12,8 @@ import SystemSettings from '../components/settings/SystemSettings.jsx';
 import TwitchSettings from '../components/settings/TwitchSettings.jsx';
 import ChatSettings from '../components/settings/ChatSettings.jsx';
 import AlertSettings from '../components/settings/AlertSettings.jsx';
+import AlertQueuePanel from '../components/settings/AlertQueuePanel.jsx';
+import AlertSoundSettings from '../components/settings/AlertSoundSettings.jsx';
 import ThemeSettings from '../components/settings/ThemeSettings.jsx';
 import ServerSettings from '../components/settings/ServerSettings.jsx';
 import BackupSettings from '../components/settings/BackupSettings.jsx';
@@ -78,7 +80,9 @@ export default function SettingsPage({ backend }) {
     const statuses = serviceStatuses(backend.connected, draft, backend.telemetry);
     const tabs = TABS.map(tab => ({
         ...tab,
-        alert: worstTone(statuses.filter(s => tab.services.includes(s.id)))
+        alert: tab.id === 'alerts' && backend.alertQueue.paused.length > 0
+            ? 'warn'
+            : worstTone(statuses.filter(s => tab.services.includes(s.id)))
     }));
 
     const panels = {
@@ -93,10 +97,19 @@ export default function SettingsPage({ backend }) {
             </>
         ),
         alerts: (
-            <AlertSettings
-                {...sectionProps('alerts')}
-                accountConnected={backend.twitchAuth?.state === 'connected'}
-            />
+            <>
+                <AlertQueuePanel queue={backend.alertQueue} />
+                <AlertSettings
+                    {...sectionProps('alerts')}
+                    // « Par défaut » ne touche pas aux sons, qui ont leurs propres boutons.
+                    onReset={defaults ? () => setValue('alerts', { ...defaults.alerts, sounds: draft.alerts.sounds }) : null}
+                    accountConnected={backend.twitchAuth?.state === 'connected'}
+                />
+                <AlertSoundSettings
+                    sounds={draft.alerts.sounds}
+                    onChange={(kind, sound) => setValue(['alerts', 'sounds', kind], sound)}
+                />
+            </>
         ),
         chat: <ChatSettings {...sectionProps('chat')} />,
         system: (
@@ -137,7 +150,7 @@ export default function SettingsPage({ backend }) {
                     <LayoutPreview
                         config={draft}
                         telemetry={backend.telemetry}
-                        alerts={backend.alerts}
+                        currentAlert={backend.alertQueue.current}
                         chat={backend.chat}
                         selectedWidget={selectedWidget}
                         onWidgetSelect={setSelectedWidget}

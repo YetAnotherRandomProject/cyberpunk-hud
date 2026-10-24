@@ -121,7 +121,7 @@
     height: 3px;
     background: var(--alert-color);
     transform-origin: left;
-    animation: alert-banner-progress var(--alert-duration) linear forwards;
+    animation: alert-banner-progress var(--alert-duration) linear var(--alert-elapsed, 0ms) forwards;
 }
 
 .alert-banner.is-placeholder .alert-banner__progress {

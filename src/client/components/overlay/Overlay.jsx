@@ -16,7 +16,7 @@ import './Overlay.css';
  * d'affichage de l'aperçu, pour convertir les déplacements en pixels HUD.
  */
 export default function Overlay({
-    config, telemetry, alerts = [], chat = [],
+    config, telemetry, currentAlert = null, chat = [],
     editable = false, previewScale = 1, selectedWidget = null, onWidgetMove, onWidgetSelect
 }) {
     const { hud, theme, widgets, twitch, texts } = config;
@@ -66,7 +66,7 @@ export default function Overlay({
 
             {/* En dernier pour passer au-dessus des autres éléments */}
             <Widget {...widgetProps('alertBanner')}>
-                <AlertBanner alerts={alerts} texts={texts.alertBanner} durationSec={config.alerts.durationSec} showPlaceholder={editable} />
+                <AlertBanner alert={currentAlert} texts={texts.alertBanner} showPlaceholder={editable} />
             </Widget>
         </div>
     );
