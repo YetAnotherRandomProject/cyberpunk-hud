@@ -26,14 +26,21 @@ function chatStatus(config, telemetry) {
     return { tone: 'error', text: telemetry.chatError || 'Connexion en cours…' };
 }
 
-export default function StatusPanel({ connected, config, telemetry }) {
+// État de chaque service : [{ id, label, tone, text }], tone ∈ 'ok' | 'warn' | 'error' | 'off'.
+export function serviceStatuses(connected, config, telemetry) {
+    return [
+        { id: 'server', label: 'Serveur HUD', ...(connected ? { tone: 'ok', text: 'Actif' } : { tone: 'error', text: 'Injoignable' }) },
+        { id: 'obs', label: 'OBS', ...obsStatus(config, telemetry) },
+        { id: 'fps', label: 'FPS du jeu', ...fpsStatus(telemetry.fps, config.system.fpsEnabled) },
+        { id: 'twitch', label: 'Twitch', ...twitchStatus(config, telemetry) },
+        { id: 'chat', label: 'Tchat', ...chatStatus(config, telemetry) }
+    ];
+}
+
+export default function StatusPanel({ statuses }) {
     return (
         <div className="status-panel">
-            <StatusLight label="Serveur HUD" {...(connected ? { tone: 'ok', text: 'Actif' } : { tone: 'error', text: 'Injoignable' })} />
-            <StatusLight label="OBS" {...obsStatus(config, telemetry)} />
-            <StatusLight label="FPS du jeu" {...fpsStatus(telemetry.fps, config.system.fpsEnabled)} />
-            <StatusLight label="Twitch" {...twitchStatus(config, telemetry)} />
-            <StatusLight label="Tchat" {...chatStatus(config, telemetry)} />
+            {statuses.map(({ id, label, tone, text }) => <StatusLight key={id} label={label} tone={tone} text={text} />)}
         </div>
     );
 }

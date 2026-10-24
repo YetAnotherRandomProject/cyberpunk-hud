@@ -1,0 +1,84 @@
+.settings-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.settings-tabs__tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 4px 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-left: 2px solid transparent;
+    color: var(--ui-text-dim);
+    font-family: var(--font-display);
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.settings-tabs__tab:hover {
+    color: var(--ui-text);
+    background: var(--ui-panel);
+}
+
+.settings-tabs__tab.is-active {
+    color: var(--ui-accent);
+    background: var(--ui-panel-raised);
+    border-color: var(--ui-border);
+    border-left-color: var(--ui-accent);
+}
+
+.settings-tabs__tab svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.settings-tabs__alert {
+    position: absolute;
+    top: 7px;
+    right: 9px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ui-warn);
+    box-shadow: 0 0 6px var(--ui-warn);
+}
+
+.settings-tabs__alert.is-error {
+    background: var(--ui-error);
+    box-shadow: 0 0 6px var(--ui-error);
+}
+
+/* Une seule colonne : les onglets passent en ligne au-dessus des réglages. */
+@media (max-width: 960px) {
+    .settings-tabs {
+        flex-direction: row;
+        overflow-x: auto;
+    }
+
+    .settings-tabs__tab {
+        flex: 1;
+        min-width: 72px;
+        border-left-width: 1px;
+        border-bottom: 2px solid transparent;
+    }
+
+    .settings-tabs__tab.is-active {
+        border-left-color: var(--ui-border);
+        border-bottom-color: var(--ui-accent);
+    }
+}

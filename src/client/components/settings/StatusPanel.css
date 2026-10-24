@@ -1,11 +1,10 @@
 .status-panel {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-@media (max-width: 1200px) {
-    .status-panel {
-        grid-template-columns: 1fr;
-    }
+/* Le détail complet est lisible dans la fenêtre : pas de texte tronqué. */
+.status-panel .status-light__text {
+    white-space: normal;
 }

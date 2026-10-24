@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useConfigDraft } from '../hooks/useConfigDraft.js';
 import { fetchDefaults } from '../lib/api.js';
 import SettingsHeader from '../components/settings/SettingsHeader.jsx';
+import SettingsTabs from '../components/settings/SettingsTabs.jsx';
 import OverlayUrlCard from '../components/settings/OverlayUrlCard.jsx';
-import StatusPanel from '../components/settings/StatusPanel.jsx';
+import { serviceStatuses } from '../components/settings/StatusPanel.jsx';
 import LayoutPreview from '../components/settings/LayoutPreview.jsx';
 import ObsSettings from '../components/settings/ObsSettings.jsx';
 import SystemSettings from '../components/settings/SystemSettings.jsx';
@@ -16,14 +17,51 @@ import WidgetSettings from '../components/settings/WidgetSettings.jsx';
 import ServerSettings from '../components/settings/ServerSettings.jsx';
 import './SettingsPage.css';
 
+// Onglets du panneau, et services dont un problème est signalé par une pastille sur l'onglet.
+const TABS = [
+    { id: 'sources', label: 'Sources', services: ['obs', 'twitch'] },
+    { id: 'alerts', label: 'Alertes', services: [] },
+    { id: 'chat', label: 'Tchat', services: ['chat'] },
+    { id: 'system', label: 'Système', services: ['server', 'fps'] },
+    { id: 'look', label: 'Apparence', services: [] },
+    { id: 'layout', label: 'Disposition', services: [] }
+];
+const TAB_STORAGE_KEY = 'cyberpunk-hud.settings-tab';
+
+// Dernier onglet ouvert (confort local : sans stockage disponible, on revient au premier).
+function readStoredTab() {
+    try {
+        const stored = localStorage.getItem(TAB_STORAGE_KEY);
+        return TABS.some(tab => tab.id === stored) ? stored : TABS[0].id;
+    } catch {
+        return TABS[0].id;
+    }
+}
+
+function worstTone(statuses) {
+    if (statuses.some(s => s.tone === 'error')) return 'error';
+    if (statuses.some(s => s.tone === 'warn')) return 'warn';
+    return null;
+}
+
 // Panneau de contrôle : tous les réglages du HUD, enregistrés automatiquement.
 export default function SettingsPage({ backend }) {
     const { draft, setValue, saveState } = useConfigDraft(backend.config);
     const [defaults, setDefaults] = useState(null);
+    const [activeTab, setActiveTab] = useState(readStoredTab);
 
     useEffect(() => {
         fetchDefaults().then(setDefaults).catch(() => setDefaults(null));
     }, []);
+
+    const selectTab = id => {
+        setActiveTab(id);
+        try {
+            localStorage.setItem(TAB_STORAGE_KEY, id);
+        } catch {
+            // stockage indisponible : l'onglet n'est simplement pas retenu
+        }
+    };
 
     if (!draft) {
         return <div className="settings-loading">Connexion au serveur HUD…</div>;
@@ -35,33 +73,58 @@ export default function SettingsPage({ backend }) {
         onReset: defaults ? () => setValue(section, defaults[section]) : null
     });
 
+    const statuses = serviceStatuses(backend.connected, draft, backend.telemetry);
+    const tabs = TABS.map(tab => ({
+        ...tab,
+        alert: worstTone(statuses.filter(s => tab.services.includes(s.id)))
+    }));
+
+    const panels = {
+        sources: (
+            <>
+                <ObsSettings {...sectionProps('obs')} />
+                <TwitchSettings
+                    {...sectionProps('twitch')}
+                    auth={backend.twitchAuth}
+                    events={backend.telemetry.twitchEvents}
+                />
+            </>
+        ),
+        alerts: (
+            <AlertSettings
+                {...sectionProps('alerts')}
+                accountConnected={backend.twitchAuth?.state === 'connected'}
+            />
+        ),
+        chat: <ChatSettings {...sectionProps('chat')} />,
+        system: (
+            <>
+                <SystemSettings {...sectionProps('system')} fps={backend.telemetry.fps} />
+                <ServerSettings {...sectionProps('server')} runtime={backend.runtime} />
+            </>
+        ),
+        look: (
+            <>
+                <HudTextSettings {...sectionProps('hud')} />
+                <ThemeSettings {...sectionProps('theme')} />
+            </>
+        ),
+        layout: <WidgetSettings {...sectionProps('widgets')} />
+    };
+
     return (
         <div className="settings-page">
-            <SettingsHeader saveState={saveState} connected={backend.connected} />
+            <SettingsHeader saveState={saveState} connected={backend.connected} statuses={statuses} />
 
             <main className="settings-page__main">
-                <div className="settings-page__forms">
-                    <ObsSettings {...sectionProps('obs')} />
-                    <SystemSettings {...sectionProps('system')} fps={backend.telemetry.fps} />
-                    <TwitchSettings
-                        {...sectionProps('twitch')}
-                        auth={backend.twitchAuth}
-                        events={backend.telemetry.twitchEvents}
-                    />
-                    <ChatSettings {...sectionProps('chat')} />
-                    <AlertSettings
-                        {...sectionProps('alerts')}
-                        accountConnected={backend.twitchAuth?.state === 'connected'}
-                    />
-                    <HudTextSettings {...sectionProps('hud')} />
-                    <ThemeSettings {...sectionProps('theme')} />
-                    <WidgetSettings {...sectionProps('widgets')} />
-                    <ServerSettings {...sectionProps('server')} runtime={backend.runtime} />
+                <SettingsTabs tabs={tabs} active={activeTab} onSelect={selectTab} />
+
+                <div className="settings-page__forms" role="tabpanel">
+                    {panels[activeTab]}
                 </div>
 
                 <div className="settings-page__aside">
                     <OverlayUrlCard runtime={backend.runtime} />
-                    <StatusPanel connected={backend.connected} config={draft} telemetry={backend.telemetry} />
                     <LayoutPreview
                         config={draft}
                         telemetry={backend.telemetry}

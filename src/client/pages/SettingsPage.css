@@ -39,8 +39,8 @@ body {
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(360px, 440px) 1fr;
-    gap: 20px;
+    grid-template-columns: 78px minmax(360px, 440px) 1fr;
+    gap: 16px 20px;
     padding: 20px;
 }
 

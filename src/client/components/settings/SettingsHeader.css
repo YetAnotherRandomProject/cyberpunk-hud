@@ -26,6 +26,12 @@
     color: var(--ui-text-dim);
 }
 
+.settings-header__right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
 .settings-header__logo {
     width: 28px;
     height: 28px;

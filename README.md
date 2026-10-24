@@ -19,7 +19,7 @@ En haut à droite, les derniers événements de la chaîne : dernier sub (mois c
 | --- | --- |
 | ![Alerte de resub](docs/screenshots/alert-sub.png) | ![Alerte de raid](docs/screenshots/alert-raid.png) |
 
-Le panneau de réglages, avec l'aperçu en direct sur lequel on place les éléments à la souris :
+Le panneau de réglages : les sections sont rangées par onglets (Sources, Alertes, Tchat, Système, Apparence, Disposition), l'état des services tient dans les cinq pastilles en haut à droite (un clic affiche le détail), et l'aperçu en direct permet de placer les éléments à la souris :
 
 ![Panneau de réglages](docs/screenshots/settings.png)
 

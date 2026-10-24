@@ -1,8 +1,9 @@
 import ArasakaKamon from '../overlay/ArasakaKamon.jsx';
 import SaveIndicator from './SaveIndicator.jsx';
+import StatusDots from './StatusDots.jsx';
 import './SettingsHeader.css';
 
-export default function SettingsHeader({ saveState, connected }) {
+export default function SettingsHeader({ saveState, connected, statuses }) {
     return (
         <header className="settings-header">
             <div className="settings-header__title">
@@ -10,7 +11,10 @@ export default function SettingsHeader({ saveState, connected }) {
                 <span>CYBERPUNK HUD</span>
                 <small>PANNEAU DE CONTRÔLE</small>
             </div>
-            <SaveIndicator saveState={saveState} connected={connected} />
+            <div className="settings-header__right">
+                <SaveIndicator saveState={saveState} connected={connected} />
+                <StatusDots statuses={statuses} />
+            </div>
         </header>
     );
 }
