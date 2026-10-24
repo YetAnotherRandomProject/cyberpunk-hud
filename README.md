@@ -7,6 +7,20 @@ Overlay OBS style Cyberpunk 2077 (Arasaka / Kiroshi) alimenté par les vraies st
 > a été écrit par un assistant IA (Claude, d'Anthropic), sous la direction et avec les tests de l'auteur.
 > Relisez-le comme tel avant de vous en inspirer.
 
+## Aperçu
+
+L'overlay tel qu'OBS l'affiche en 1920×1080 (ici sur un fond neutre, avec des données de démonstration) :
+
+![Overlay complet : marque, statut système, dernier follower, carte streameur, tchat et bandeau de télémétrie](docs/screenshots/overlay.png)
+
+| Alerte de resub | Alerte de raid |
+| --- | --- |
+| ![Alerte de resub](docs/screenshots/alert-sub.png) | ![Alerte de raid](docs/screenshots/alert-raid.png) |
+
+Le panneau de réglages, avec l'aperçu en direct sur lequel on place les éléments à la souris :
+
+![Panneau de réglages](docs/screenshots/settings.png)
+
 ## Pour l'utilisateur final
 
 1. Télécharger `CyberpunkHUD-Setup-x.y.z.exe` depuis les [releases](https://github.com/YetAnotherRandomProject/cyberpunk-hud/releases/latest) et le lancer (installation dans le profil utilisateur, sans droits administrateur).

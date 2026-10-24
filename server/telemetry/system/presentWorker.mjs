@@ -1,7 +1,7 @@
 // Thread dédié à la lecture des événements ETW : ProcessTrace() bloque jusqu'à l'arrêt
 // de la session, et chaque événement passe par le callback ci-dessous.
 import { parentPort, workerData } from 'node:worker_threads';
-import { consumeTraceSession, enableProvider, readEventField, startTraceSession, Win32Error } from './win32.js';
+import { consumeTraceSession, enableProvider, readEventField, startTraceSession, Win32Error } from './win32.mjs';
 
 // Fournisseurs ETW qui signalent chaque image présentée, et leurs événements « Present ».
 // Le premier mot du GUID suffit à les distinguer.

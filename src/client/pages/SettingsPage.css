@@ -54,6 +54,15 @@ body {
     padding-right: 4px;
 }
 
+/* L'aperçu prend la hauteur restante : seuls les blocs du haut gardent leur taille. */
+.settings-page__aside > * {
+    flex-shrink: 0;
+}
+
+.settings-page__aside > .layout-preview {
+    flex: 1 1 0;
+}
+
 @media (max-width: 960px) {
     .settings-page__main {
         grid-template-columns: 1fr;

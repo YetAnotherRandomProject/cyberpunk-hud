@@ -3,12 +3,13 @@ import { fileURLToPath } from 'node:url';
 import { Worker } from 'node:worker_threads';
 import {
     ERROR_ACCESS_DENIED, foregroundWindow, performanceFrequency, processImageName, stopTraceSession
-} from './win32.js';
+} from './win32.mjs';
 
 const SESSION_NAME = 'CyberpunkHUD-FPS';
 const RETRY_DELAY_MS = 30_000;
 // Le thread lit des fichiers du disque : hors de l'archive asar une fois l'application empaquetée.
-const WORKER_PATH = fileURLToPath(new URL('./presentWorker.js', import.meta.url))
+// Là, aucun package.json ne déclare "type": "module" : d'où l'extension .mjs du worker et de win32.
+const WORKER_PATH = fileURLToPath(new URL('./presentWorker.mjs', import.meta.url))
     .replace(`app.asar${path.sep}`, `app.asar.unpacked${path.sep}`);
 // En dessous, la mesure d'un échantillon n'est pas fiable (application qui ne redessine qu'au besoin).
 const MIN_FRAMES = 3;

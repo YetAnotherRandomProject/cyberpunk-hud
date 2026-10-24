@@ -1,3 +1,10 @@
+.layout-preview {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .layout-preview__label {
     display: flex;
     justify-content: space-between;
@@ -8,12 +15,20 @@
     color: var(--ui-text-dim);
 }
 
+/* Zone mesurée : l'aperçu 16:9 s'y inscrit au plus grand possible. */
+.layout-preview__area {
+    flex: 1;
+    min-height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 .layout-preview__frame {
     position: relative;
-    width: 100%;
     overflow: hidden;
     border: 1px solid var(--ui-border-strong);
-    flex-shrink: 0;
+    box-sizing: content-box;
 }
 
 .layout-preview__canvas {
@@ -23,4 +38,13 @@
     width: 1920px;
     height: 1080px;
     transform-origin: top left;
+}
+
+/* Une seule colonne : la page défile, l'aperçu prend toute la largeur. */
+@media (max-width: 960px) {
+    .layout-preview__area {
+        flex: none;
+        min-height: 0;
+        aspect-ratio: 16 / 9;
+    }
 }
